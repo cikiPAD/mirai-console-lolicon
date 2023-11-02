@@ -317,8 +317,13 @@ object Lolicon : CompositeCommand(
             if (num > 5 || num <=0) {
                 num = 2
             }
-            var body: RequestBody = RequestBody()
-            body.num = num
+            var str = "{\"num\":"+num+"}"
+            val body: RequestBody = runCatching {
+                Json.decodeFromString<RequestBody>(str)
+            }.onFailure {
+                sendMessage(ReplyConfig.invalidJson)
+                logger.warning(it)
+            }.getOrNull() ?: return@withLock
             logger.info(body.toString())
             val notificationReceipt = getNotificationReceipt()
             if (body.r18 != r18) {

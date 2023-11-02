@@ -311,7 +311,7 @@ object Lolicon : CompositeCommand(
         mutex.withLock {
             val (r18, recall, cooldown) = ExecutionConfig(subject)
             var num = 2;
-            if (json != null) {
+            if (json != null && !json.isEmpty()) {
                 num = json.toInt()
             }
             if (num > 5 || num <=0) {

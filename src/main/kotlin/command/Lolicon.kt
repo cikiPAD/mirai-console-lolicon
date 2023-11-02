@@ -310,7 +310,10 @@ object Lolicon : CompositeCommand(
         }
         mutex.withLock {
             val (r18, recall, cooldown) = ExecutionConfig(subject)
-            val num = parseInt(json)
+            val num = 2;
+            if (json != null) {
+                num = json.toInt()
+            }
             if (num > 5 || num <=0) {
                 num = 2
             }

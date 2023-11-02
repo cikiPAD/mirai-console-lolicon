@@ -302,7 +302,7 @@ object Lolicon : CompositeCommand(
 
     @SubCommand("多来点", "来几张")
     @Description("多发几张图")
-    suspend fun CommandSender.advanced2(json: String) {
+    suspend fun CommandSender.advanced2(json: String = "") {
         val mutex = getSubjectMutex(subject) ?: return
         if (mutex.isLocked) {
             logger.info("throttled")

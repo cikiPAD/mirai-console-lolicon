@@ -317,7 +317,7 @@ object Lolicon : CompositeCommand(
             if (num > 5 || num <=0) {
                 num = 2
             }
-            var str = "{\"num\":"+num+ "," +  "\"size\":" +"[\""  +PluginConfig.size.name.lowercase()+   "\"]"  +","+  "\"r18\":"  + r18   +"}"
+            var str = "{\"num\":"+num+ "," +  "\"size\":" +"[\""  +PluginConfig.size.name.lowercase()+   "\"]"  +","+  "\"r18\":"  + r18  +","+ "\"proxy\":" + "\""+ PluginConfig.proxy+"\""  +"}"
             val body: RequestBody = runCatching {
                 Json.decodeFromString<RequestBody>(str)
             }.onFailure {

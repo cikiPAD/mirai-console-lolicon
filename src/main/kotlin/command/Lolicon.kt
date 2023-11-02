@@ -302,7 +302,7 @@ object Lolicon : CompositeCommand(
 
     @SubCommand("多来点", "来几张")
     @Description("多发几张图")
-    suspend fun CommandSender.advanced2(json: String = "") {
+    suspend fun CommandSender.someimages(json: String = "") {
         val mutex = getSubjectMutex(subject) ?: return
         if (mutex.isLocked) {
             logger.info("throttled")
@@ -317,7 +317,7 @@ object Lolicon : CompositeCommand(
             if (num > 5 || num <=0) {
                 num = 2
             }
-            var str = "{\"num\":"+num+"}"
+            var str = "{\"num\":"+num+ "," +  "\"size\":" +"[\""  +PluginConfig.size.name.lowercase()+   "\"]"  +","+  "\"r18\":"  + r18   +"}"
             val body: RequestBody = runCatching {
                 Json.decodeFromString<RequestBody>(str)
             }.onFailure {

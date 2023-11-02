@@ -299,6 +299,166 @@ object Lolicon : CompositeCommand(
         }
     }
 
+
+    @SubCommand("多来点", "来几张")
+    @Description("多发几张图")
+    suspend fun CommandSender.advanced(json: String) {
+        val mutex = getSubjectMutex(subject) ?: return
+        if (mutex.isLocked) {
+            logger.info("throttled")
+            return
+        }
+        mutex.withLock {
+            val (r18, recall, cooldown) = ExecutionConfig(subject)
+            val num = parseInt(json)
+            if (num > 5 || num <=0) {
+                num = 2
+            }
+            val body: RequestBody = RequestBody()
+            body.num = num
+            logger.info(body.toString())
+            val notificationReceipt = getNotificationReceipt()
+            if (body.r18 != r18) {
+                if (subject is Group && !(user as Member).isOperator()) {
+                    sendMessage(ReplyConfig.nonAdminPermissionDenied)
+                    return@withLock
+                }
+                if (subject is User && !this.hasPermission(trusted)) {
+                    sendMessage(ReplyConfig.untrusted)
+                    return@withLock
+                }
+            }
+            val response = processRequest(body) ?: return@withLock
+            if (subject != null && PluginConfig.messageType == PluginConfig.Type.Forward) {
+                val contact = subject as Contact
+                val imageMsgBuilder = ForwardMessageBuilder(contact)
+                imageMsgBuilder.displayStrategy = CustomDisplayStrategy
+                for (imageData in response.data) {
+                    when {
+                        imageData.urls.size > 1 -> {
+                            imageMsgBuilder.add(contact.bot, PlainText(imageData.toReadable(imageData.urls)))
+                            for (url in imageData.urls.values) {
+                                runCatching {
+                                    val stream = getImageInputStream(url)
+                                    val image = contact.uploadImage(stream)
+                                    imageMsgBuilder.add(contact.bot, image)
+                                    stream
+                                }.onFailure {
+                                    logger.error(it)
+                                    imageMsgBuilder.add(contact.bot, PlainText(ReplyConfig.networkError))
+                                }.onSuccess {
+                                    runInterruptible(Dispatchers.IO) {
+                                        it.close()
+                                    }
+                                }
+                            }
+                        }
+
+                        imageData.urls.size == 1 -> {
+                            runCatching {
+                                val stream = getImageInputStream(imageData.urls.values.first())
+                                val image = contact.uploadImage(stream)
+                                imageMsgBuilder.add(contact.bot, PlainText(imageData.toReadable(imageData.urls)))
+                                imageMsgBuilder.add(contact.bot, image)
+                                stream
+                            }.onFailure {
+                                logger.error(it)
+                                imageMsgBuilder.add(contact.bot, PlainText(imageData.toReadable(imageData.urls)))
+                                imageMsgBuilder.add(contact.bot, PlainText(ReplyConfig.networkError))
+                            }.onSuccess {
+                                runInterruptible(Dispatchers.IO) {
+                                    it.close()
+                                }
+                            }
+                        }
+
+                        else -> {
+                            continue
+                        }
+                    }
+                }
+                val imgReceipt = sendMessage(imageMsgBuilder.build())
+                if (notificationReceipt != null)
+                    recall(RecallType.NOTIFICATION, notificationReceipt, 0)
+                if (imgReceipt == null) {
+                    return@withLock
+                } else if (recall > 0 && PluginConfig.recallImg)
+                    recall(RecallType.IMAGE, imgReceipt, recall)
+                if (cooldown > 0)
+                    cooldown(subject, cooldown)
+            } else {
+                val imageInfoMsgBuilder = MessageChainBuilder()
+                val imageMsgBuilder = MessageChainBuilder()
+                for (imageData in response.data) {
+                    when {
+                        imageData.urls.size > 1 -> {
+                            for (url in imageData.urls.values) {
+                                runCatching {
+                                    val stream = getImageInputStream(url)
+                                    val image = subject?.uploadImage(stream)
+                                    if (image != null)
+                                        if (PluginConfig.messageType == PluginConfig.Type.Flash)
+                                            imageMsgBuilder.add(FlashImage(image))
+                                        else
+                                            imageMsgBuilder.add(image)
+                                    stream
+                                }.onFailure {
+                                    logger.error(it)
+                                    sendMessage(ReplyConfig.networkError)
+                                }.onSuccess {
+                                    imageInfoMsgBuilder.add(imageData.toReadable(imageData.urls))
+                                    imageInfoMsgBuilder.add("\n")
+                                    runInterruptible(Dispatchers.IO) {
+                                        it.close()
+                                    }
+                                }
+                            }
+                        }
+
+                        imageData.urls.size == 1 -> runCatching {
+                            val stream = getImageInputStream(imageData.urls.values.first())
+                            val image = subject?.uploadImage(stream)
+                            if (image != null)
+                                if (PluginConfig.messageType == PluginConfig.Type.Flash)
+                                    imageMsgBuilder.add(FlashImage(image))
+                                else
+                                    imageMsgBuilder.add(image)
+                            stream
+                        }.onFailure {
+                            logger.error(it)
+                            sendMessage(ReplyConfig.networkError)
+                        }.onSuccess {
+                            imageInfoMsgBuilder.add(imageData.toReadable(imageData.urls))
+                            imageInfoMsgBuilder.add("\n")
+                            runInterruptible(Dispatchers.IO) {
+                                it.close()
+                            }
+                        }
+
+                        else -> {
+                            continue
+                        }
+                    }
+                }
+                val imgInfoReceipt =
+                    if (subject == null || PluginConfig.verbose)
+                        sendMessage(imageInfoMsgBuilder.asMessageChain())
+                    else null
+                val imgReceipt = sendMessage(imageMsgBuilder.build())
+                if (notificationReceipt != null)
+                    recall(RecallType.NOTIFICATION, notificationReceipt, 0)
+                if (imgReceipt == null) {
+                    return@withLock
+                } else if (recall > 0 && PluginConfig.recallImg)
+                    recall(RecallType.IMAGE, imgReceipt, recall)
+                if (PluginConfig.verbose && imgInfoReceipt != null && recall > 0 && PluginConfig.recallImgInfo)
+                    recall(RecallType.IMAGE_INFO, imgInfoReceipt, recall)
+                if (cooldown > 0)
+                    cooldown(subject, cooldown)
+            }
+        }
+    }
+
     @SubCommand("set", "设置")
     @Description("设置属性, 详见帮助信息")
     suspend fun CommandSenderOnMessage<MessageEvent>.set(property: PluginData.Property, value: Int) {

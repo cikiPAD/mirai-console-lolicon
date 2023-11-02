@@ -317,7 +317,7 @@ object Lolicon : CompositeCommand(
             if (num > 5 || num <=0) {
                 num = 2
             }
-            val body: RequestBody = RequestBody()
+            var body: RequestBody = RequestBody()
             body.num = num
             logger.info(body.toString())
             val notificationReceipt = getNotificationReceipt()

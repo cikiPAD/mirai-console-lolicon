@@ -1,4 +1,4 @@
-package test;
+package io.github.samarium150.mirai.plugin.lolicon.command;
 
 
 import java.io.*;

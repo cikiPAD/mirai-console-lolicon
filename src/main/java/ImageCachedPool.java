@@ -15,6 +15,8 @@ import java.util.concurrent.TimeUnit;
 
 public class ImageCachedPool extends Thread {
 
+    public volatile boolean started = false;
+
     public volatile boolean isActiveNow = false;
 
     public volatile boolean isRunning = true;
@@ -109,16 +111,13 @@ public class ImageCachedPool extends Thread {
     }
 
 
-    public void startRun(Runnable runnable) throws InterruptedException {
-        isActiveNow = true;
-        while(isActiveNow) {
-            try {
-                Thread.sleep(200);
-                runnable.run();
-            }
-            catch (Exception e) {
-                e.printStackTrace();
-            }
+    public void startRun(Runnable runnable) {
+        if (started) {
+            return;
+        }
+        else {
+            started = true;
+            this.start();
         }
     }
 

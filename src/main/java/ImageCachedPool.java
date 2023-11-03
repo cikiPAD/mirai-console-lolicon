@@ -26,8 +26,8 @@ public class ImageCachedPool extends Thread {
 
     public String url = "https://api.lolicon.app/setu/v2";
 
-    private static int size = 30;
-    private static String storagePath = "/home/mirai/imageCache/";
+    private static int size = 50;
+    private static String storagePath = "/root/mirai/imageCache/";
     private static BlockingQueue<String> files = new LinkedBlockingDeque<>(size);
     public static ImageCachedPool instance = new ImageCachedPool();
 

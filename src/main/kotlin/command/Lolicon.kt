@@ -495,7 +495,7 @@ object Lolicon : CompositeCommand(
 
     @SubCommand("装填", "上膛")
     @Description("加载缓存池")
-    suspend fun CommandSenderOnMessage<MessageEvent>.reloadcache(tags: String = "") {
+    suspend fun CommandSenderOnMessage<MessageEvent>.reloadcache(reqNum: String = "") {
         if (fromEvent !is GroupMessageEvent && fromEvent !is FriendMessageEvent)
             return
         if (fromEvent is GroupMessageEvent && !(fromEvent as GroupMessageEvent).sender.isOperator()) {
@@ -509,8 +509,8 @@ object Lolicon : CompositeCommand(
         logger.info("开始装填")
         val (r18, recall, cooldown) = ExecutionConfig(subject)
         var num = 2
-        if (json != null && !json.isEmpty()) {
-            num = json.toInt()
+        if (reqNum != null && !reqNum.isEmpty()) {
+            num = reqNum.toInt()
         }
         if (num > 5 || num <=0) {
             num = 2

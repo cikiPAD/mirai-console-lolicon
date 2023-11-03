@@ -21,6 +21,9 @@ dependencies {
     implementation("io.ktor:ktor-client-okhttp-jvm")
     implementation("io.ktor:ktor-client-content-negotiation")
     implementation("io.ktor:ktor-serialization-kotlinx-json")
+    implementation("com.google.code.gson:gson:2.8.5")
+    implementation("org.apache.httpcomponents:httpclient:4.5.10")
+    implementation("org.apache.httpcomponents:httpcore:4.4.12")
 }
 
 tasks {

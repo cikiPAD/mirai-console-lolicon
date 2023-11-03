@@ -518,7 +518,7 @@ object Lolicon : CompositeCommand(
         var str = "{\"num\":"+num+ "," +  "\"size\":" +"[\""  +PluginConfig.size.name.lowercase()+   "\"]"  +","+  "\"r18\":"  + r18  +","+ "\"proxy\":" + "\""+ PluginConfig.proxy+"\""  +"}"
         ImageCachedPool.instance.changeReq(str);
         ImageCachedPool.instance.isActiveNow = true;
-        ImageCachedPool.instance.start();
+        ImageCachedPool.instance.startRun();
         
         sendMessage("开始加载缓存池，配置为" + str)
     }

@@ -6,6 +6,7 @@ import com.google.gson.Gson;
 import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
@@ -111,7 +112,7 @@ public class ImageCachedPool extends Thread {
     }
 
 
-    public void startRun(Runnable runnable) {
+    public void startRun() {
         if (started) {
             return;
         }

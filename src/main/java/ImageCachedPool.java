@@ -10,6 +10,9 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
 
 public class ImageCachedPool {
+
+    public volatile boolean isActiveNow = false;
+
     private static int size = 30;
     private static String storagePath = "/home/mirai/imageCache/";
     private static BlockingQueue<String> files = new LinkedBlockingDeque<>(size);
@@ -90,6 +93,24 @@ public class ImageCachedPool {
     public static void setPath(String path) {
         storagePath = path;
         checkDirExist(path);
+    }
+
+
+    public void start(Runnable runnable) throws InterruptedException {
+        isActiveNow = true;
+        while(isActiveNow) {
+            try {
+                Thread.sleep(200);
+                runnable.run();
+            }
+            catch (Exception e) {
+
+            }
+        }
+    }
+
+    public void stop() {
+        isActiveNow = false;
     }
 
 }

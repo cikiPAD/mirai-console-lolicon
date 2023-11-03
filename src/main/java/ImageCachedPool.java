@@ -144,7 +144,9 @@ public class ImageCachedPool extends Thread {
             try {
                 while (isActiveNow) {
                     Thread.sleep(1000);
-                    String s = LoliHttpClient.postForBody(url, reqJson, null);
+                    Map<String, String> header = new HashMap<>();
+                    header.put("Content-Type", "application/json");
+                    String s = LoliHttpClient.postForBody(url, reqJson, header);
                     if (s == null) {
                         Thread.sleep(5000);
                         continue;

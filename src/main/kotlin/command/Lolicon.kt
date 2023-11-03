@@ -16,6 +16,7 @@
  */
 package io.github.samarium150.mirai.plugin.lolicon.command
 
+import io.github.samarium150.mirai.plugin.lolicon.command.ImageCachedPool
 import io.github.samarium150.mirai.plugin.lolicon.MiraiConsoleLolicon
 import io.github.samarium150.mirai.plugin.lolicon.config.CommandConfig
 import io.github.samarium150.mirai.plugin.lolicon.config.ExecutionConfig
@@ -489,5 +490,158 @@ object Lolicon : CompositeCommand(
             sendMessage(ReplyConfig.setSucceeded)
         else
             sendMessage(value.toString() + ReplyConfig.illegalValue)
+    }
+
+
+    @SubCommand("装填", "上膛")
+    @Description("加载缓存池")
+    suspend fun CommandSenderOnMessage<MessageEvent>.reloadcache(tags: String = "") {
+        if (fromEvent !is GroupMessageEvent && fromEvent !is FriendMessageEvent)
+            return
+        if (fromEvent is GroupMessageEvent && !(fromEvent as GroupMessageEvent).sender.isOperator()) {
+            sendMessage(ReplyConfig.nonAdminPermissionDenied)
+            return
+        }
+        if (fromEvent is FriendMessageEvent && !this.hasPermission(trusted)) {
+            sendMessage(ReplyConfig.untrusted)
+            return
+        }
+        logger.info("开始装填")
+        val (r18, recall, cooldown) = ExecutionConfig(subject)
+        var num = 2
+        if (json != null && !json.isEmpty()) {
+            num = json.toInt()
+        }
+        if (num > 5 || num <=0) {
+            num = 2
+        }
+        var str = "{\"num\":"+num+ "," +  "\"size\":" +"[\""  +PluginConfig.size.name.lowercase()+   "\"]"  +","+  "\"r18\":"  + r18  +","+ "\"proxy\":" + "\""+ PluginConfig.proxy+"\""  +"}"
+        ImageCachedPool.instance.changeReq(str);
+        ImageCachedPool.instance.isActiveNow = true;
+        ImageCachedPool.instance.start();
+        
+        sendMessage("开始加载缓存池，配置为" + str)
+    }
+
+    @SubCommand("搞快点", "gkd")
+    @Description("加载缓存")
+    suspend fun CommandSender.someimagescache(json: String = "") {
+        val mutex = getSubjectMutex(subject) ?: return
+        if (mutex.isLocked) {
+            logger.info("throttled")
+            return
+        }
+        mutex.withLock {
+            val (r18, recall, cooldown) = ExecutionConfig(subject)
+            
+            logger.info(body.toString())
+            val notificationReceipt = getNotificationReceipt()
+            
+            if (subject != null && PluginConfig.messageType == PluginConfig.Type.Forward) {
+                val contact = subject as Contact
+                val imageMsgBuilder = ForwardMessageBuilder(contact)
+                imageMsgBuilder.displayStrategy = CustomDisplayStrategy
+                
+                    
+                //imageMsgBuilder.add(contact.bot, PlainText(imageData.toReadable(imageData.urls)))
+
+                for (i in 0 until 5) {
+                    runCatching {
+                        val stream = ImageCachedPool.instance.getImage()
+                        val image = contact.uploadImage(stream)
+                        imageMsgBuilder.add(contact.bot, image)
+                        stream
+                    }.onFailure {
+                        logger.error(it)
+                        imageMsgBuilder.add(contact.bot, PlainText(ReplyConfig.networkError))
+                    }.onSuccess {
+                        runInterruptible(Dispatchers.IO) {
+                            it.close()
+                        }
+                    }
+                }
+                            
+                
+                val imgReceipt = sendMessage(imageMsgBuilder.build())
+                if (notificationReceipt != null)
+                    recall(RecallType.NOTIFICATION, notificationReceipt, 0)
+                if (imgReceipt == null) {
+                    return@withLock
+                } else if (recall > 0 && PluginConfig.recallImg)
+                    recall(RecallType.IMAGE, imgReceipt, recall)
+                if (cooldown > 0)
+                    cooldown(subject, cooldown)
+             }
+                //else {
+            //     val imageInfoMsgBuilder = MessageChainBuilder()
+            //     val imageMsgBuilder = MessageChainBuilder()
+            //     for (imageData in response.data) {
+            //         when {
+            //             imageData.urls.size > 1 -> {
+            //                 for (url in imageData.urls.values) {
+            //                     runCatching {
+            //                         val stream = getImageInputStream(url)
+            //                         val image = subject?.uploadImage(stream)
+            //                         if (image != null)
+            //                             if (PluginConfig.messageType == PluginConfig.Type.Flash)
+            //                                 imageMsgBuilder.add(FlashImage(image))
+            //                             else
+            //                                 imageMsgBuilder.add(image)
+            //                         stream
+            //                     }.onFailure {
+            //                         logger.error(it)
+            //                         sendMessage(ReplyConfig.networkError)
+            //                     }.onSuccess {
+            //                         imageInfoMsgBuilder.add(imageData.toReadable(imageData.urls))
+            //                         imageInfoMsgBuilder.add("\n")
+            //                         runInterruptible(Dispatchers.IO) {
+            //                             it.close()
+            //                         }
+            //                     }
+            //                 }
+            //             }
+
+            //             imageData.urls.size == 1 -> runCatching {
+            //                 val stream = getImageInputStream(imageData.urls.values.first())
+            //                 val image = subject?.uploadImage(stream)
+            //                 if (image != null)
+            //                     if (PluginConfig.messageType == PluginConfig.Type.Flash)
+            //                         imageMsgBuilder.add(FlashImage(image))
+            //                     else
+            //                         imageMsgBuilder.add(image)
+            //                 stream
+            //             }.onFailure {
+            //                 logger.error(it)
+            //                 sendMessage(ReplyConfig.networkError)
+            //             }.onSuccess {
+            //                 imageInfoMsgBuilder.add(imageData.toReadable(imageData.urls))
+            //                 imageInfoMsgBuilder.add("\n")
+            //                 runInterruptible(Dispatchers.IO) {
+            //                     it.close()
+            //                 }
+            //             }
+
+            //             else -> {
+            //                 continue
+            //             }
+            //         }
+            //     }
+            //     val imgInfoReceipt =
+            //         if (subject == null || PluginConfig.verbose)
+            //             sendMessage(imageInfoMsgBuilder.asMessageChain())
+            //         else null
+            //     val imgReceipt = sendMessage(imageMsgBuilder.build())
+            //     if (notificationReceipt != null)
+            //         recall(RecallType.NOTIFICATION, notificationReceipt, 0)
+            //     if (imgReceipt == null) {
+            //         return@withLock
+            //     } else if (recall > 0 && PluginConfig.recallImg)
+            //         recall(RecallType.IMAGE, imgReceipt, recall)
+            //     if (PluginConfig.verbose && imgInfoReceipt != null && recall > 0 && PluginConfig.recallImgInfo)
+            //         recall(RecallType.IMAGE_INFO, imgInfoReceipt, recall)
+            //     if (cooldown > 0)
+            //         cooldown(subject, cooldown)
+            // }
+        }
     }
 }

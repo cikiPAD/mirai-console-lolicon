@@ -493,7 +493,7 @@ object Lolicon : CompositeCommand(
     }
 
 
-    @SubCommand("装填", "上膛")
+    @SubCommand("装填", "开始涩涩")
     @Description("加载缓存池")
     suspend fun CommandSenderOnMessage<MessageEvent>.reloadcache(reqNum: String = "") {
         if (fromEvent !is GroupMessageEvent && fromEvent !is FriendMessageEvent)
@@ -523,6 +523,28 @@ object Lolicon : CompositeCommand(
         sendMessage("开始加载缓存池，配置为" + str)
     }
 
+
+    @SubCommand("停止涩涩", "退膛")
+    @Description("停止缓存池")
+    suspend fun CommandSenderOnMessage<MessageEvent>.stopcache(reqNum: String = "") {
+        if (fromEvent !is GroupMessageEvent && fromEvent !is FriendMessageEvent)
+            return
+        if (fromEvent is GroupMessageEvent && !(fromEvent as GroupMessageEvent).sender.isOperator()) {
+            sendMessage(ReplyConfig.nonAdminPermissionDenied)
+            return
+        }
+        if (fromEvent is FriendMessageEvent && !this.hasPermission(trusted)) {
+            sendMessage(ReplyConfig.untrusted)
+            return
+        }
+        logger.info("停止装填")
+        
+        ImageCachedPool.instance.isActiveNow = false;
+    
+        
+        sendMessage("停止缓存池")
+    }
+
     @SubCommand("搞快点", "gkd")
     @Description("加载缓存")
     suspend fun CommandSender.someimagescache(json: String = "") {
@@ -534,7 +556,6 @@ object Lolicon : CompositeCommand(
         mutex.withLock {
             val (r18, recall, cooldown) = ExecutionConfig(subject)
             
-            logger.info(body.toString())
             val notificationReceipt = getNotificationReceipt()
             
             if (subject != null && PluginConfig.messageType == PluginConfig.Type.Forward) {

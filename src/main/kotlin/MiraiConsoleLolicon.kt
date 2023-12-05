@@ -82,11 +82,11 @@ object MiraiConsoleLolicon : KotlinPlugin(
 
         Lolicon.trusted
         Lolicon.register()
-        ImageCachedPool.instance.isRunning = true;
+        //ImageCachedPool.instance.isRunning = true;
     }
 
     override fun onDisable() {
-        ImageCachedPool.instance.isRunning = false;
+        //ImageCachedPool.instance.isRunning = false;
         
         Lolicon.unregister()
 

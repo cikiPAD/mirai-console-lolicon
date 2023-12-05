@@ -49,6 +49,10 @@ public class ImageCachedPool extends Thread {
         }
     }
 
+    public double getSizePer() {
+        return files.size()/size;
+    }
+
     public void putImage(String url) throws InterruptedException {
         //不要爬太快
         Thread.sleep(2000);

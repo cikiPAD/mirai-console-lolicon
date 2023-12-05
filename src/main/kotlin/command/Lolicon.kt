@@ -573,7 +573,7 @@ object Lolicon : CompositeCommand(
                 //imageMsgBuilder.add(contact.bot, PlainText(imageData.toReadable(imageData.urls)))
 
                 var needPending = false
-                if (ImageCachedPool.instance.getSizePer() > 0.5) {
+                if (ImageCachedPool.instance.getSizePer() > 0.2) {
                     needPending = true
                 }
 

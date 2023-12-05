@@ -572,6 +572,15 @@ object Lolicon : CompositeCommand(
                     
                 //imageMsgBuilder.add(contact.bot, PlainText(imageData.toReadable(imageData.urls)))
 
+                var needPending = false
+                if (ImageCachedPool.instance.getSizePer() > 0.5) {
+                    needPending = true
+                }
+
+                if (needPending) {
+                    ImageCachedPool.instance.isActiveNow = false
+                }
+
                 for (i in 0 until 5) {
                     runCatching {
                         val stream = ImageCachedPool.instance.getImage()
@@ -598,6 +607,10 @@ object Lolicon : CompositeCommand(
                     recall(RecallType.IMAGE, imgReceipt, recall)
                 if (cooldown > 0)
                     cooldown(subject, cooldown)
+
+                if (needPending) {
+                    ImageCachedPool.instance.isActiveNow = true
+                }
              }
                 //else {
             //     val imageInfoMsgBuilder = MessageChainBuilder()

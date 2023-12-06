@@ -47,11 +47,15 @@ public class ImageSourceManager {
 
 
     public List<String> getImageUrls(String type, Map<String, Object> params) {
-        if (sources.containsKey(type)) {
-            return sources.get(type).getImageUrl(filterNullValues(params));
+        try {
+            if (sources.containsKey(type)) {
+                return sources.get(type).getImageUrl(filterNullValues(params));
+            } else {
+                return new ArrayList<>();
+            }
         }
-        else {
-            throw new IllegalArgumentException("不支持类型");
+        catch (Exception e){
+            return new ArrayList<>();
         }
     }
 

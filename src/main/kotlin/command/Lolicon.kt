@@ -659,7 +659,7 @@ object Lolicon : CompositeCommand(
                         imageMsgBuilder.add(contact.bot, image)
                         stream
                     }.onFailure {
-                        logger.error(it)
+                        logger.error(imageUrl)
                         imageMsgBuilder.add(contact.bot, PlainText(ReplyConfig.networkError))
                     }.onSuccess {
                         runInterruptible(Dispatchers.IO) {

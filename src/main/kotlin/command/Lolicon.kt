@@ -646,7 +646,7 @@ object Lolicon : CompositeCommand(
                     ?.filterNotNull()
                     ?: emptyList()
 
-                if (it.data.isEmpty()) {
+                if (imageUrls.isEmpty()) {
                     sendMessage(ReplyConfig.emptyImageData)
                     return@withLock
                 }
@@ -659,7 +659,7 @@ object Lolicon : CompositeCommand(
                         imageMsgBuilder.add(contact.bot, image)
                         stream
                     }.onFailure {
-                        logger.error(imageUrl)
+                        logger.error(it)
                         imageMsgBuilder.add(contact.bot, PlainText(ReplyConfig.networkError))
                     }.onSuccess {
                         runInterruptible(Dispatchers.IO) {

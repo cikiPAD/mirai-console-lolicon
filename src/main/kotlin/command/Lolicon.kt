@@ -16,7 +16,7 @@
  */
 package io.github.samarium150.mirai.plugin.lolicon.command
 
-import io.github.samarium150.mirai.plugin.lolicon.command.ImageCachedPool
+import io.github.samarium150.mirai.plugin.lolicon.command.ImageSourceManager
 import io.github.samarium150.mirai.plugin.lolicon.MiraiConsoleLolicon
 import io.github.samarium150.mirai.plugin.lolicon.config.CommandConfig
 import io.github.samarium150.mirai.plugin.lolicon.config.ExecutionConfig
@@ -615,4 +615,61 @@ object Lolicon : CompositeCommand(
                 
     //     }
     // }
+
+    @SubCommand("搞快点", "gkd")
+    @Description("加载缓存")
+    suspend fun CommandSender.someimagescache(json: String = "") {
+        val mutex = getSubjectMutex(subject) ?: return
+        if (mutex.isLocked) {
+            logger.info("throttled")
+            return
+        }
+        mutex.withLock {
+            val (r18, recall, cooldown) = ExecutionConfig(subject)
+            val req: MutableMap<String, Any?> = HashMap()
+            req[ParamsConstant.R18] = r18
+            req[ParamsConstant.NUM] = 2
+            req[ParamsConstant.TAG] = json
+            req[ParamsConstant.SIZE] = "regular"
+            val notificationReceipt = getNotificationReceipt()
+            
+            if (subject != null && PluginConfig.messageType == PluginConfig.Type.Forward) {
+                val contact = subject as Contact
+                val imageMsgBuilder = ForwardMessageBuilder(contact)
+                imageMsgBuilder.displayStrategy = CustomDisplayStrategy
+                
+                    
+                //imageMsgBuilder.add(contact.bot, PlainText(imageData.toReadable(imageData.urls)))
+
+                val imageUrls: List<String?> = ImageSourceManager.getInstance()?.getImageUrls(SourceTypeConstant.NYAN, req) ?: emptyList()
+                for (imageUrl in imageUrls) {
+                    runCatching {
+                        val stream = getImageInputStream(imageUrl)
+                        val image = contact.uploadImage(stream)
+                        imageMsgBuilder.add(contact.bot, image)
+                        stream
+                    }.onFailure {
+                        logger.error(it)
+                        imageMsgBuilder.add(contact.bot, PlainText(ReplyConfig.networkError))
+                    }.onSuccess {
+                        runInterruptible(Dispatchers.IO) {
+                            it.close()
+                        }
+                    }
+                }
+
+            
+                                
+                val imgReceipt = sendMessage(imageMsgBuilder.build())
+                if (notificationReceipt != null)
+                    recall(RecallType.NOTIFICATION, notificationReceipt, 0)
+                if (imgReceipt == null) {
+                    return@withLock
+                } else if (recall > 0 && PluginConfig.recallImg)
+                    recall(RecallType.IMAGE, imgReceipt, recall)
+                if (cooldown > 0)
+                    cooldown(subject, cooldown)
+             }
+        }
+    }
 }

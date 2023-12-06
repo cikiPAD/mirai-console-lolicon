@@ -16,7 +16,7 @@
  */
 package io.github.samarium150.mirai.plugin.lolicon.command
 
-import io.github.samarium150.mirai.plugin.lolicon.command.ImageCachedPool
+import io.github.samarium150.mirai.plugin.lolicon.command.ImageSourceManager
 import io.github.samarium150.mirai.plugin.lolicon.MiraiConsoleLolicon
 import io.github.samarium150.mirai.plugin.lolicon.config.CommandConfig
 import io.github.samarium150.mirai.plugin.lolicon.config.ExecutionConfig
@@ -599,6 +599,66 @@ object Lolicon : CompositeCommand(
     //             if (cooldown > 0)
     //                 cooldown(subject, cooldown)
     //          }
+    //     }
+    // }
+
+
+
+
+    // @SubCommand("get2", "整一张")
+    // @Description("根据标签发送涩图, 不提供则随机发送一张")
+    // suspend fun CommandSender.get(tags: String = "") {
+    //     val mutex = getSubjectMutex(subject) ?: return
+    //     if (mutex.isLocked) {
+    //         logger.info("throttled")
+    //         return
+    //     }
+    //     mutex.withLock {
+    //         val (r18, recall, cooldown) = ExecutionConfig(subject)
+            
+    //         val url = ImageSourceManager.getInstance(). ?: return@withLock
+    //         val imgInfoReceipt =
+    //             if (subject == null ||
+    //                 PluginConfig.verbose && PluginConfig.messageType != PluginConfig.Type.Forward
+    //             ) sendMessage(imageData.toReadable(url))
+    //             else null
+    //         if (subject == null && !PluginConfig.save)
+    //             return@withLock
+    //         val stream: InputStream?
+    //         try {
+    //             stream = getImageInputStream(url)
+    //         } catch (e: Exception) {
+    //             logger.error(e)
+    //             sendMessage(ReplyConfig.networkError)
+    //             return@withLock
+    //         }
+    //         if (subject == null) {
+    //             runInterruptible(Dispatchers.IO) {
+    //                 stream.close()
+    //             }
+    //             return@withLock
+    //         }
+    //         val image = (subject as Contact).uploadImage(stream)
+    //         val imgReceipt = sendMessage(
+    //             buildMessage(
+    //                 subject as Contact,
+    //                 if (PluginConfig.verbose) imageData.toReadable(url) else "",
+    //                 image
+    //             )
+    //         )
+    //         if (notificationReceipt != null)
+    //             recall(RecallType.NOTIFICATION, notificationReceipt, 0)
+    //         if (imgReceipt == null)
+    //             return@withLock
+    //         else if (recall > 0 && PluginConfig.recallImg)
+    //             recall(RecallType.IMAGE, imgReceipt, recall)
+    //         if (PluginConfig.verbose && imgInfoReceipt != null && recall > 0 && PluginConfig.recallImgInfo)
+    //             recall(RecallType.IMAGE_INFO, imgInfoReceipt, recall)
+    //         if (cooldown > 0)
+    //             cooldown(subject, cooldown)
+    //         runInterruptible(Dispatchers.IO) {
+    //             stream.close()
+    //         }
     //     }
     // }
 }

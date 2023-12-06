@@ -16,7 +16,6 @@
  */
 package io.github.samarium150.mirai.plugin.lolicon.command
 
-import io.github.samarium150.mirai.plugin.lolicon.command.ImageSourceManager
 import io.github.samarium150.mirai.plugin.lolicon.MiraiConsoleLolicon
 import io.github.samarium150.mirai.plugin.lolicon.config.CommandConfig
 import io.github.samarium150.mirai.plugin.lolicon.config.ExecutionConfig

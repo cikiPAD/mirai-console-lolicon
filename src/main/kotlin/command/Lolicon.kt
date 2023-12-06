@@ -642,7 +642,10 @@ object Lolicon : CompositeCommand(
                     
                 //imageMsgBuilder.add(contact.bot, PlainText(imageData.toReadable(imageData.urls)))
 
-                val imageUrls: List<String?> = ImageSourceManager.getInstance()?.getImageUrls(SourceTypeConstant.NYAN, req) ?: emptyList()
+                val imageUrls: List<String> = ImageSourceManager.getInstance()?.getImageUrls(SourceTypeConstant.NYAN, req)
+                    ?.filterNotNull()
+                    ?: emptyList()
+
                 for (imageUrl in imageUrls) {
                     runCatching {
                         val stream = getImageInputStream(imageUrl)

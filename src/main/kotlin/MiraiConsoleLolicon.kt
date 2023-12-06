@@ -17,7 +17,6 @@
 package io.github.samarium150.mirai.plugin.lolicon
 
 
-import io.github.samarium150.mirai.plugin.lolicon.command.ImageSourceManager
 import io.github.samarium150.mirai.plugin.lolicon.command.Lolicon
 import io.github.samarium150.mirai.plugin.lolicon.config.*
 import io.github.samarium150.mirai.plugin.lolicon.data.PluginData
@@ -82,7 +81,7 @@ object MiraiConsoleLolicon : KotlinPlugin(
 
         Lolicon.trusted
         Lolicon.register()
-        ImageSourceManager.getInstance().init();
+        //ImageSourceManager.getInstance().init();
         //ImageCachedPool.instance.isRunning = true;
     }
 

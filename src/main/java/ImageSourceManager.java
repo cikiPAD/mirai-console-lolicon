@@ -4,6 +4,7 @@ import io.github.samarium150.mirai.plugin.lolicon.command.impl.LoliconSourceImpl
 import io.github.samarium150.mirai.plugin.lolicon.command.impl.NyanSourceImpl;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

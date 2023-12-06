@@ -17,7 +17,7 @@
 package io.github.samarium150.mirai.plugin.lolicon
 
 
-import io.github.samarium150.mirai.plugin.lolicon.command.ImageCachedPool
+import io.github.samarium150.mirai.plugin.lolicon.command.ImageSourceManager
 import io.github.samarium150.mirai.plugin.lolicon.command.Lolicon
 import io.github.samarium150.mirai.plugin.lolicon.config.*
 import io.github.samarium150.mirai.plugin.lolicon.data.PluginData
@@ -82,11 +82,12 @@ object MiraiConsoleLolicon : KotlinPlugin(
 
         Lolicon.trusted
         Lolicon.register()
-        ImageCachedPool.instance.isRunning = true;
+        ImageSourceManager.getInstance().init();
+        //ImageCachedPool.instance.isRunning = true;
     }
 
     override fun onDisable() {
-        ImageCachedPool.instance.isRunning = false;
+        //ImageCachedPool.instance.isRunning = false;
         
         Lolicon.unregister()
 

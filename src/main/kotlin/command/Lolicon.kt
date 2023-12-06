@@ -646,8 +646,14 @@ object Lolicon : CompositeCommand(
                     ?.filterNotNull()
                     ?: emptyList()
 
+                if (it.data.isEmpty()) {
+                    sendMessage(ReplyConfig.emptyImageData)
+                    return@withLock
+                }
+
                 for (imageUrl in imageUrls) {
                     runCatching {
+                        logger.info(imageUrl)
                         val stream = getImageInputStream(imageUrl)
                         val image = contact.uploadImage(stream)
                         imageMsgBuilder.add(contact.bot, image)

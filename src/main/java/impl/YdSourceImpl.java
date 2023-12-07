@@ -61,7 +61,7 @@ public class YdSourceImpl implements ImageSourceInterface {
             params.remove(ParamsConstant.TAG);
         }
         else {
-            params.put(ParamsConstant.YD_TYPE, "二次元动漫综合系列");
+            params.put(ParamsConstant.YD_TYPE, "P站系列4");
         }
 
         params.put("参数", "json");

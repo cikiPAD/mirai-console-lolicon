@@ -653,7 +653,7 @@ object Lolicon : CompositeCommand(
                     
                 //imageMsgBuilder.add(contact.bot, PlainText(imageData.toReadable(imageData.urls)))
 
-                val imageUrls: List<String> = ImageSourceManager.getInstance()?.getImageUrls(SourceTypeConstant.NYAN, req)
+                val imageUrls: List<String> = ImageSourceManager.getInstance()?.getImageUrls(req)
                     ?.filterNotNull()
                     ?: emptyList()
 

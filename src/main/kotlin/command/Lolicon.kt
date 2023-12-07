@@ -629,8 +629,19 @@ object Lolicon : CompositeCommand(
             val (r18, recall, cooldown) = ExecutionConfig(subject)
             val req: MutableMap<String, Any?> = HashMap()
             req[ParamsConstant.R18] = r18
-            req[ParamsConstant.NUM] = 2
-            req[ParamsConstant.TAG] = json
+
+            val num: Int? = json.toIntOrNull()
+            if (num != null) {
+                if (num in 1..5) {
+                    req[ParamsConstant.NUM] = num
+                }
+                else {
+                    req[ParamsConstant.NUM] = 2
+                }
+            } else {
+                req[ParamsConstant.NUM] = 2
+                req[ParamsConstant.TAG] = json
+            }
             req[ParamsConstant.SIZE] = "regular"
             val notificationReceipt = getNotificationReceipt()
             

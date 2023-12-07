@@ -9,7 +9,7 @@ on:
 
 jobs:
   check:
-    environment: OPENAI
+    environment: LOLI
     runs-on: ubuntu-latest
     steps:
 

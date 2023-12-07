@@ -618,7 +618,7 @@ object Lolicon : CompositeCommand(
     // }
 
     @SubCommand("搞快点", "gkd")
-    @Description("加载缓存")
+    @Description("使用多个图库查询涩图")
     suspend fun CommandSender.someimagescache(json: String = "") {
         val mutex = getSubjectMutex(subject) ?: return
         if (mutex.isLocked) {
@@ -691,6 +691,30 @@ object Lolicon : CompositeCommand(
                 if (cooldown > 0)
                     cooldown(subject, cooldown)
              }
+        }
+    }
+
+
+    @SubCommand("setSource", "设置图库")
+    @Description("设置图库, 详见帮助信息")
+    suspend fun CommandSenderOnMessage<MessageEvent>.set(type: String = "") {
+        if (fromEvent !is GroupMessageEvent && fromEvent !is FriendMessageEvent)
+            return
+        if (fromEvent is GroupMessageEvent && !(fromEvent as GroupMessageEvent).sender.isOperator()) {
+            sendMessage(ReplyConfig.nonAdminPermissionDenied)
+            return
+        }
+        if (fromEvent is FriendMessageEvent && !this.hasPermission(trusted)) {
+            sendMessage(ReplyConfig.untrusted)
+            return
+        }
+        logger.info("set 图库 to $type")
+        if(ImageSourceManager.getInstance().setCurrentType(type)) {
+            sendMessage("成功设置图库为$type")
+        }
+        else {
+            val allType = ImageSourceManager.getInstance().getAllType();
+            sendMessage("不支持的图库类型:$type,当前支持以下类型:$allType")
         }
     }
 }

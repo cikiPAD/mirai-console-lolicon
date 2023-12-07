@@ -1,5 +1,7 @@
 package io.github.samarium150.mirai.plugin.lolicon.command;
 
+import io.github.samarium150.mirai.plugin.lolicon.command.constant.ParamsConstant;
+import io.github.samarium150.mirai.plugin.lolicon.command.constant.SourceTypeConstant;
 import io.github.samarium150.mirai.plugin.lolicon.command.impl.LoliconSourceImpl;
 import io.github.samarium150.mirai.plugin.lolicon.command.impl.NyanSourceImpl;
 
@@ -16,6 +18,8 @@ import java.util.Map;
 public class ImageSourceManager {
 
     public static ImageSourceManager instance = new ImageSourceManager();
+
+    private String currentType = SourceTypeConstant.NYAN;
 
 
     private ImageSourceManager() {
@@ -61,6 +65,21 @@ public class ImageSourceManager {
     }
 
 
+    public List<String> getImageUrls(Map<String, Object> params) {
+        try {
+            if (sources.containsKey(currentType)) {
+                return sources.get(currentType).getImageUrl(filterNullValues(params));
+            } else {
+                return new ArrayList<>();
+            }
+        }
+        catch (Exception e){
+            return new ArrayList<>();
+        }
+    }
+
+
+
     public static Map<String, Object> filterNullValues(Map<String, Object> params) {
         Map<String, Object> filteredParams = new HashMap<>();
 
@@ -77,7 +96,23 @@ public class ImageSourceManager {
     }
 
 
+    public String getCurrentType() {
+        return currentType;
+    }
 
+    public boolean setCurrentType(String type) {
+        if (sources.containsKey(type)) {
+            currentType = type;
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    public String getAllType() {
+        return String.join(",",sources.keySet());
+    }
 
 
 }

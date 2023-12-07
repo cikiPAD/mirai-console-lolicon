@@ -642,7 +642,7 @@ object Lolicon : CompositeCommand(
                 req[ParamsConstant.NUM] = 2
                 req[ParamsConstant.TAG] = json
             }
-            req[ParamsConstant.SIZE] = "regular"
+            req[ParamsConstant.SIZE] = PluginConfig.size.name.lowercase()
             val notificationReceipt = getNotificationReceipt()
             
             if (subject != null && PluginConfig.messageType == PluginConfig.Type.Forward) {

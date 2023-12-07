@@ -58,6 +58,9 @@ public class YdSourceImpl implements ImageSourceInterface {
             if (params.get(ParamsConstant.TAG) != null || ((String)params.get(ParamsConstant.TAG)).trim().length()>0 ) {
                 params.put(ParamsConstant.YD_TYPE, params.get(ParamsConstant.TAG));
             }
+            else {
+                params.put(ParamsConstant.YD_TYPE, "P站系列4");
+            }
             params.remove(ParamsConstant.TAG);
         }
         else {

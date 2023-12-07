@@ -55,7 +55,7 @@ public class YdSourceImpl implements ImageSourceInterface {
     @Override
     public Map<String, Object> standardParams(Map<String, Object> params) {
         if (params.containsKey(ParamsConstant.TAG)) {
-            if (params.get(ParamsConstant.TAG) != null || ((String)params.get(ParamsConstant.TAG)).trim().length()>0 ) {
+            if (params.get(ParamsConstant.TAG) != null && ((String)params.get(ParamsConstant.TAG)).trim().length()>0 ) {
                 params.put(ParamsConstant.YD_TYPE, params.get(ParamsConstant.TAG));
             }
             else {

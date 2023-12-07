@@ -52,7 +52,9 @@ public class NyanSourceImpl implements ImageSourceInterface {
     @Override
     public Map<String, Object> standardParams(Map<String, Object> params) {
         if (params.containsKey(ParamsConstant.TAG)) {
-            params.put(ParamsConstant.NYAN_KEYWORD, params.get(ParamsConstant.TAG));
+            if (params.get(ParamsConstant.TAG) != null || ((String)params.get(ParamsConstant.TAG)).trim().length()>0 ) {
+                params.put(ParamsConstant.NYAN_KEYWORD, params.get(ParamsConstant.TAG));
+            }
             params.remove(ParamsConstant.TAG);
         }
 
@@ -80,9 +82,9 @@ public class NyanSourceImpl implements ImageSourceInterface {
             else {
                 List<String> ret = new ArrayList<>();
                 for (String url:urls) {
-                    String tmp = url.replace("img-original", "img-master").replace("_p0.","_p0_master1200.");
+                    String tmp = url.replace("img-original", "img-master").replace("sex.nyan.xyz", ParamsConstant.PROXY_HOST);
                     tmp = tmp.substring(0, tmp.lastIndexOf("."));
-                    tmp = tmp + ".jpg";
+                    tmp = tmp + "_master1200.jpg";
                     ret.add(tmp);
                 }
                 return ret;

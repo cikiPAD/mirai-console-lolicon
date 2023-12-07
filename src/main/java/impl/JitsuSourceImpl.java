@@ -16,7 +16,7 @@ import java.util.Map;
 public class JitsuSourceImpl implements ImageSourceInterface {
 
     //https://moe.jitsu.top/api/?sort=jitsu&size=original&type=json&num=5&proxy=i.pixiv.re
-    public String url = "https://moe.jitsu.top/api/";
+    public String url = "https://moe.jitsu.top/img/";
 
     @Override
     public String getType() {

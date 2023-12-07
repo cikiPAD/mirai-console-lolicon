@@ -14,4 +14,6 @@ public class ParamsConstant {
     public static final String ORIGINAL_SIZE = "original";
 
     public static final String NYAN_KEYWORD = "keyword";
+
+    public static final String PROXY_HOST = "i.pixiv.re";
 }

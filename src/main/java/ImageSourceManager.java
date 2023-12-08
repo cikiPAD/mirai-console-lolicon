@@ -2,10 +2,7 @@ package io.github.samarium150.mirai.plugin.lolicon.command;
 
 import io.github.samarium150.mirai.plugin.lolicon.command.constant.ParamsConstant;
 import io.github.samarium150.mirai.plugin.lolicon.command.constant.SourceTypeConstant;
-import io.github.samarium150.mirai.plugin.lolicon.command.impl.JitsuSourceImpl;
-import io.github.samarium150.mirai.plugin.lolicon.command.impl.LoliconSourceImpl;
-import io.github.samarium150.mirai.plugin.lolicon.command.impl.NyanSourceImpl;
-import io.github.samarium150.mirai.plugin.lolicon.command.impl.YdSourceImpl;
+import io.github.samarium150.mirai.plugin.lolicon.command.impl.*;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -42,6 +39,10 @@ public class ImageSourceManager {
         register(new NyanSourceImpl());
         register(new JitsuSourceImpl());
         register(new YdSourceImpl());
+        register(new XljSourceImpl());
+        register(new VvhanSourceImpl());
+        register(new TangdouzSourceImpl());
+        register(new StarChenTSourceImpl());
     }
 
 

@@ -11,7 +11,7 @@ import java.util.Map;
 public class TangdouzSourceImpl extends SimpleSourceImpl {
     @Override
     String getUrl() {
-        return "http://api.tangdouz.com/hlxmt.php";
+        return "http://112.124.10.57:8090/";
     }
 
     @Override

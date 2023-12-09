@@ -667,8 +667,8 @@ object Lolicon : CompositeCommand(
 
 
                 val uploadStart = System.currentTimeMillis()
-                var onlyUploadTime = 0
-                var onlyDownloadTime = 0
+                var onlyUploadTime: Long = 0
+                var onlyDownloadTime: Long = 0
                 for (imageUrl in imageUrls) {
                     runCatching {
                         logger.info(imageUrl)

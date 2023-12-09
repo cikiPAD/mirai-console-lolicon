@@ -31,6 +31,9 @@ import kotlinx.coroutines.runInterruptible
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.withContext
 import net.mamoe.mirai.console.command.CommandSender
 import net.mamoe.mirai.console.command.CommandSenderOnMessage
 import net.mamoe.mirai.console.command.CompositeCommand
@@ -646,7 +649,7 @@ object Lolicon : CompositeCommand(
             val notificationReceipt = getNotificationReceipt()
             
             if (subject != null && PluginConfig.messageType == PluginConfig.Type.Forward) {
-                val allTimeStart = System.currentTimeMillis()
+                //val allTimeStart = System.currentTimeMillis()
                 val contact = subject as Contact
                 val imageMsgBuilder = ForwardMessageBuilder(contact)
                 imageMsgBuilder.displayStrategy = CustomDisplayStrategy
@@ -666,32 +669,48 @@ object Lolicon : CompositeCommand(
                 }
 
 
+                // val uploadStart = System.currentTimeMillis()
+                // var onlyUploadTime: Long = 0
+                // var onlyDownloadTime: Long = 0
+                // for (imageUrl in imageUrls) {
+                //     runCatching {
+                //         logger.info(imageUrl)
+                //         val oneDownloadTimeStart = System.currentTimeMillis()
+                //         val stream = getImageInputStream(imageUrl)
+                //         onlyDownloadTime += (System.currentTimeMillis()-oneDownloadTimeStart)
+                //         val oneUploadTimeStart = System.currentTimeMillis()
+                //         val image = contact.uploadImage(stream)
+                //         onlyUploadTime += (System.currentTimeMillis()-oneUploadTimeStart)
+                //         imageMsgBuilder.add(contact.bot, image)
+                //         stream
+                //     }.onFailure {
+                //         logger.error(it)
+                //         imageMsgBuilder.add(contact.bot, PlainText(ReplyConfig.networkError))
+                //     }.onSuccess {
+                //         runInterruptible(Dispatchers.IO) {
+                //             it.close()
+                //         }
+                //     }
+                // }
+
+                // val uploadTime = System.currentTimeMillis() - uploadStart
+
+
+
                 val uploadStart = System.currentTimeMillis()
-                var onlyUploadTime: Long = 0
-                var onlyDownloadTime: Long = 0
-                for (imageUrl in imageUrls) {
-                    runCatching {
-                        logger.info(imageUrl)
-                        val oneDownloadTimeStart = System.currentTimeMillis()
-                        val stream = getImageInputStream(imageUrl)
-                        onlyDownloadTime += (System.currentTimeMillis()-oneDownloadTimeStart)
-                        val oneUploadTimeStart = System.currentTimeMillis()
-                        val image = contact.uploadImage(stream)
-                        onlyUploadTime += (System.currentTimeMillis()-oneUploadTimeStart)
-                        imageMsgBuilder.add(contact.bot, image)
-                        stream
-                    }.onFailure {
-                        logger.error(it)
-                        imageMsgBuilder.add(contact.bot, PlainText(ReplyConfig.networkError))
-                    }.onSuccess {
-                        runInterruptible(Dispatchers.IO) {
-                            it.close()
-                        }
-                    }
+                val onlyUploadTime: Long = 0
+                val onlyDownloadTime: Long = 0
+
+                runCatching {
+                    val imageUrls = // 图像 URL 列表
+                    processImages(imageUrls, contact)
+                }.onFailure {
+                    logger.error(it)
+                    imageMsgBuilder.add(contact.bot, PlainText(ReplyConfig.networkError))
                 }
 
-                val uploadTime = System.currentTimeMillis() - uploadStart
-
+                val totalTime = System.currentTimeMillis() - uploadStart
+                logger.info("总上传时间：$totalTime 毫秒")
             
                                 
                 val imgReceipt = sendMessage(imageMsgBuilder.build())
@@ -703,12 +722,33 @@ object Lolicon : CompositeCommand(
                     recall(RecallType.IMAGE, imgReceipt, recall)
                 if (cooldown > 0)
                     cooldown(subject, cooldown)
-                val allTime = System.currentTimeMillis() - allTimeStart;
-                logger.info("总共耗时$allTime ms, 调用图片api接口耗时$getUrlTime ms, 下载上传图片总共耗时$uploadTime ms, 下载图片合计耗时$onlyDownloadTime ms, 上传图片合计耗时$onlyUploadTime ms")
+                //val allTime = System.currentTimeMillis() - allTimeStart;
+                //logger.info("总共耗时$allTime ms, 调用图片api接口耗时$getUrlTime ms, 下载上传图片总共耗时$uploadTime ms, 下载图片合计耗时$onlyDownloadTime ms, 上传图片合计耗时$onlyUploadTime ms")
              }
             
         }
     }
+
+
+    suspend fun processImages(imageUrls: List<String>, contact: Contact) {
+        val onlyDownloadTime = measureTimeMillis {
+            val downloadTasks = imageUrls.map { imageUrl ->
+                async(Dispatchers.IO) {
+                    val stream = getImageInputStream(imageUrl)
+                    val image = contact.uploadImage(stream)
+                    stream.close()
+                    image
+                }
+            }
+            val images = downloadTasks.awaitAll()
+            images.forEach { image ->
+                imageMsgBuilder.add(contact.bot, image)
+            }
+        }
+
+        logger.info("总下载时间：$onlyDownloadTime 毫秒")
+    }
+
 
 
     @SubCommand("setSource", "设置图库")

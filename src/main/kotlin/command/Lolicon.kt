@@ -626,6 +626,7 @@ object Lolicon : CompositeCommand(
             return
         }
         mutex.withLock {
+            val allTimeStart = System.currentTimeMillis()
             val (r18, recall, cooldown) = ExecutionConfig(subject)
             val req: MutableMap<String, Any?> = HashMap()
             req[ParamsConstant.R18] = r18
@@ -652,16 +653,20 @@ object Lolicon : CompositeCommand(
                 
                     
                 //imageMsgBuilder.add(contact.bot, PlainText(imageData.toReadable(imageData.urls)))
-
+                val getUrlStart = System.currentTimeMillis()
                 val imageUrls: List<String> = ImageSourceManager.getInstance()?.getImageUrls(req)
                     ?.filterNotNull()
                     ?: emptyList()
+
+                val getUrlTime = System.currentTimeMillis() - getUrlStart
 
                 if (imageUrls.isEmpty()) {
                     sendMessage(ReplyConfig.emptyImageData)
                     return@withLock
                 }
 
+
+                val uploadStart = System.currentTimeMillis()
                 for (imageUrl in imageUrls) {
                     runCatching {
                         logger.info(imageUrl)
@@ -679,6 +684,8 @@ object Lolicon : CompositeCommand(
                     }
                 }
 
+                val uploadTime = System.currentTimeMillis() - uploadStart
+
             
                                 
                 val imgReceipt = sendMessage(imageMsgBuilder.build())
@@ -691,6 +698,8 @@ object Lolicon : CompositeCommand(
                 if (cooldown > 0)
                     cooldown(subject, cooldown)
              }
+            val allTime = System.currentTimeMillis() - allTimeStart;
+            log.info("总共耗时$allTime ms, 调用图片api接口耗时$getUrlTime ms, 上传图片耗时$uploadTime ms")
         }
     }
 

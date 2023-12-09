@@ -667,11 +667,17 @@ object Lolicon : CompositeCommand(
 
 
                 val uploadStart = System.currentTimeMillis()
+                var onlyUploadTime = 0
+                var onlyDownloadTime = 0
                 for (imageUrl in imageUrls) {
                     runCatching {
                         logger.info(imageUrl)
+                        val oneDownloadTimeStart = System.currentTimeMillis()
                         val stream = getImageInputStream(imageUrl)
+                        onlyDownloadTime += (System.currentTimeMillis()-oneDownloadTimeStart)
+                        val oneUploadTimeStart = System.currentTimeMillis()
                         val image = contact.uploadImage(stream)
+                        onlyUploadTime += (System.currentTimeMillis()-oneUploadTimeStart)
                         imageMsgBuilder.add(contact.bot, image)
                         stream
                     }.onFailure {
@@ -698,7 +704,7 @@ object Lolicon : CompositeCommand(
                 if (cooldown > 0)
                     cooldown(subject, cooldown)
                 val allTime = System.currentTimeMillis() - allTimeStart;
-                logger.info("总共耗时$allTime ms, 调用图片api接口耗时$getUrlTime ms, 上传图片耗时$uploadTime ms")
+                logger.info("总共耗时$allTime ms, 调用图片api接口耗时$getUrlTime ms, 下载上传图片总共耗时$uploadTime ms, 下载图片合计耗时$onlyDownloadTime ms, 上传图片合计耗时$onlyUploadTime ms")
              }
             
         }

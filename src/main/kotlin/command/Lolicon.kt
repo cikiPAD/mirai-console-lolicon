@@ -32,6 +32,7 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import kotlinx.coroutines.async
+import kotlin.system.measureTimeMillis
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
 import net.mamoe.mirai.console.command.CommandSender
@@ -741,9 +742,10 @@ object Lolicon : CompositeCommand(
                 }
             }
             val images = downloadTasks.awaitAll()
-            images.forEach { image ->
+            images.forEach { image: Image ->
                 imageMsgBuilder.add(contact.bot, image)
             }
+            
         }
 
         logger.info("总下载时间：$onlyDownloadTime 毫秒")

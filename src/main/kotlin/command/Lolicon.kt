@@ -626,7 +626,6 @@ object Lolicon : CompositeCommand(
             return
         }
         mutex.withLock {
-            val allTimeStart = System.currentTimeMillis()
             val (r18, recall, cooldown) = ExecutionConfig(subject)
             val req: MutableMap<String, Any?> = HashMap()
             req[ParamsConstant.R18] = r18
@@ -647,6 +646,7 @@ object Lolicon : CompositeCommand(
             val notificationReceipt = getNotificationReceipt()
             
             if (subject != null && PluginConfig.messageType == PluginConfig.Type.Forward) {
+                val allTimeStart = System.currentTimeMillis()
                 val contact = subject as Contact
                 val imageMsgBuilder = ForwardMessageBuilder(contact)
                 imageMsgBuilder.displayStrategy = CustomDisplayStrategy
@@ -697,9 +697,10 @@ object Lolicon : CompositeCommand(
                     recall(RecallType.IMAGE, imgReceipt, recall)
                 if (cooldown > 0)
                     cooldown(subject, cooldown)
+                val allTime = System.currentTimeMillis() - allTimeStart;
+                logger.info("总共耗时$allTime ms, 调用图片api接口耗时$getUrlTime ms, 上传图片耗时$uploadTime ms")
              }
-            val allTime = System.currentTimeMillis() - allTimeStart;
-            log.info("总共耗时$allTime ms, 调用图片api接口耗时$getUrlTime ms, 上传图片耗时$uploadTime ms")
+            
         }
     }
 

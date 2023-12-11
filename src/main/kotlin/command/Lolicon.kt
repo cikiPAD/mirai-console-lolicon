@@ -17,6 +17,7 @@
 package io.github.samarium150.mirai.plugin.lolicon.command
 
 import io.github.samarium150.mirai.plugin.lolicon.command.constant.*
+import io.github.samarium150.mirai.plugin.lolicon.command.ImageCachedPool
 import io.github.samarium150.mirai.plugin.lolicon.command.ImageSourceManager
 import io.github.samarium150.mirai.plugin.lolicon.MiraiConsoleLolicon
 import io.github.samarium150.mirai.plugin.lolicon.config.CommandConfig
@@ -749,6 +750,7 @@ object Lolicon : CompositeCommand(
             return
         }
         logger.info("开始装填")
+        launch {
         boot(Runnable {
             val req: MutableMap<String, Any?> = HashMap()
             req[ParamsConstant.R18] = 0
@@ -760,7 +762,7 @@ object Lolicon : CompositeCommand(
                     ?: emptyList()
 
 
-            val images = ArrayList();
+            images:List<Any> = ArrayList();
             
             for (imageUrl in imageUrls) {
                     runCatching {
@@ -810,12 +812,11 @@ object Lolicon : CompositeCommand(
             }
 
             ImageCachedPool.getInstance().putImage(images ,req);
-        
-        
-        
+    
         })
+        }
         
-        sendMessage("开始加载缓存池，配置为" + str)
+        sendMessage("开始加载缓存池")
     }
 
 

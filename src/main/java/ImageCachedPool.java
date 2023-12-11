@@ -1,17 +1,13 @@
 package io.github.samarium150.mirai.plugin.lolicon.command;
 
 
-import com.google.gson.Gson;
+
+import io.github.samarium150.mirai.plugin.lolicon.command.constant.ParamsConstant;
 
 import java.io.*;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
 
 
 public class ImageCachedPool extends Thread {
@@ -22,122 +18,107 @@ public class ImageCachedPool extends Thread {
 
     public volatile boolean isRunning = true;
 
-    public String reqJson = "{}";
 
-    public String url = "https://api.lolicon.app/setu/v2";
+    private static int size = ParamsConstant.CACHE_LIMIT;
 
-    private static int size = 50;
-    private static String storagePath = "/root/mirai/imageCache/";
-    private static BlockingQueue<String> files = new LinkedBlockingDeque<>(size);
-    public static ImageCachedPool instance = new ImageCachedPool();
+
+    private static ConcurrentLinkedQueue<Object> images = new ConcurrentLinkedQueue<>();
+
+
+    private static ConcurrentLinkedQueue<Object> imagesSp = new ConcurrentLinkedQueue<>();
+
+
+    private static ImageCachedPool instance = new ImageCachedPool();
+
+    private int loopCount = 0;
+
+
+    private Runnable runnable = null;
+
+    private Runnable runnableSp = null;
+
+
 
 
     private ImageCachedPool() {
     }
 
-    static {
-        checkDirExist(storagePath);
+
+    public static ImageCachedPool getInstance() {
+        return instance;
     }
 
-    public InputStream getImage() throws InterruptedException, FileNotFoundException {
-        String path = files.poll(60, TimeUnit.SECONDS);
-        if (path != null) {
-            return new FileInputStream(path);
+    /**
+     * 只处理2张图片，不带keyword的请求
+     * @return
+     * @throws InterruptedException
+     * @throws FileNotFoundException
+     */
+    public Object getImageByParam(Map<String, Object> params) {
+        String tag = (String) params.get(ParamsConstant.TAG);
+        int num = (int) params.get(ParamsConstant.NUM);
+        int r18 = (int) params.get(ParamsConstant.R18);
+        //2张图片，且不带tag
+        if (num == 2 && (tag == null || tag.trim().length() == 0)) {
+            if (r18 == 1) {
+                Object ret =  imagesSp.poll();
+                startRun();
+                return ret;
+            }
+            else {
+                Object ret = images.poll();
+                startRun();
+                return ret;
+            }
         }
         else {
             return null;
         }
     }
 
-    public double getSizePer() {
-        return files.size()/size;
-    }
-
-    public void putImage(String url) throws InterruptedException {
-        //不要爬太快
-        Thread.sleep(2000);
-        if (url == null || url.length() == 0) {
-            return;
-        }
-
-        InputStream is = null;
-        OutputStream os = null;
-        try {
-            URL u = new URL(url);
-            URLConnection connection = u.openConnection();
-            connection.addRequestProperty("User-Agent", "Mozilla/4.0 (compatible; MSIE 5.0; Windows NT; DigExt)");
-            is = connection.getInputStream();
-            String suffix = url.substring(url.lastIndexOf("."), url.length());
-            String fileName = storagePath + "" + System.currentTimeMillis() + suffix;
-            os = new FileOutputStream(fileName);
-            byte[] buffer = new byte[1024];
-            int bytesRead;
-            while ((bytesRead = is.read(buffer)) != -1) {
-                os.write(buffer, 0, bytesRead);
-            }
-            files.put(fileName);
-
-        }
-        catch (Exception e) {
-            System.out.println(e);
-        }
-        finally {
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            if (os != null) {
-                try {
-                    os.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+    public void putImage(Object entities,Map<String, Object> params) {
+        int r18 = (int) params.get(ParamsConstant.R18);
+        if (r18 == 1) {
+            imagesSp.offer(entities);
+            if (imagesSp.size()>size*2) {
+                System.out.println("imagesSp超载,数量"+ size);
             }
         }
-
-    }
-
-    private static void checkDirExist(String strLocal)
-    {
-        File file = new File(strLocal);
-        if (!file.exists() && !file.isDirectory())
-        {
-            file.mkdirs();
+        else {
+            images.offer(entities);
+            if (images.size()>size*2) {
+                System.out.println("images超载,数量"+ size);
+            }
         }
-    }
-
-    public static void setPath(String path) {
-        storagePath = path;
-        checkDirExist(path);
     }
 
 
     public void startRun() {
-        if (started) {
-            return;
-        }
-        else {
-            started = true;
-            this.start();
-        }
+        loopCount = 0;
+        isActiveNow = true;
     }
 
     public void stopRun() {
         isActiveNow = false;
     }
 
+    public void boot(Runnable runnable, Runnable runnableSp) {
+        if (started) {
+            return;
+        }
+        else {
+            this.runnable = runnable;
+            this.runnableSp = runnableSp;
+            started = true;
+            isActiveNow = true;
+            this.start();
+        }
+    }
 
     public void shutdown() {
         isRunning = false;
     }
 
-    public void changeReq(String req) {
-        this.reqJson = req;
-    }
 
 
     @Override
@@ -146,24 +127,30 @@ public class ImageCachedPool extends Thread {
         while(isRunning) {
 
             try {
+                System.out.println("开始填充");
                 while (isActiveNow) {
                     Thread.sleep(1000);
-                    Map<String, String> header = new HashMap<>();
-                    header.put("Content-Type", "application/json");
-                    String s = LoliHttpClient.postForBody(url, reqJson, header);
-                    if (s == null) {
-                        Thread.sleep(5000);
-                        continue;
+                    if (images.size() < size) {
+                        long startTime = System.currentTimeMillis();
+                        System.out.println(String.format("开始填充普通图库,当前缓存大小: %s", images.size() + ""));
+                        runnable.run();
+                        Thread.sleep(500);
+                        System.out.println(String.format("填充普通图库执行结束,耗时%s ms,当前缓存大小: %s", (System.currentTimeMillis() - startTime)+ "", images.size()+"" ));
                     }
-                    Gson gson = new Gson();
-                    Map map = gson.fromJson(s, Map.class);
-                    List<Map<String, Map<String, Object>>> data = (List<Map<String, Map<String, Object>>>) map.get("data");
 
-                    for (Map<String, Map<String, Object>> one:data) {
-                        Map<String, Object> urlsData = one.get("urls");
-                        for (String key :urlsData.keySet()) {
-                            putImage((String) urlsData.get(key));
-                        }
+                    if (imagesSp.size() < size) {
+                        long startTime = System.currentTimeMillis();
+                        System.out.println(String.format("开始填充特殊图库,当前缓存大小: %s", imagesSp.size() + ""));
+                        runnableSp.run();
+                        Thread.sleep(500);
+                        System.out.println(String.format("填充特殊图库执行结束,耗时%s ms,当前缓存大小: %s", (System.currentTimeMillis() - startTime)+ "", imagesSp.size() + "" ));
+                    }
+                    loopCount++;
+                    //避免频繁上传，连续循环5次就关闭
+                    System.out.println("循环计数count:" + loopCount);
+                    if (loopCount >= size) {
+                        System.out.println("停止填充");
+                        isActiveNow = false;
                     }
                 }
             }

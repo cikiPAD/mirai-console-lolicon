@@ -733,4 +733,110 @@ object Lolicon : CompositeCommand(
             sendMessage("不支持的图库类型:$type,当前支持以下类型:$allType")
         }
     }
+
+
+    @SubCommand("上膛", "开始涩涩")
+    @Description("加载缓存池")
+    suspend fun CommandSenderOnMessage<MessageEvent>.reloadcache(reqNum: String = "") {
+        if (fromEvent !is GroupMessageEvent && fromEvent !is FriendMessageEvent)
+            return
+        if (fromEvent is GroupMessageEvent && !(fromEvent as GroupMessageEvent).sender.isOperator()) {
+            sendMessage(ReplyConfig.nonAdminPermissionDenied)
+            return
+        }
+        if (fromEvent is FriendMessageEvent && !this.hasPermission(trusted)) {
+            sendMessage(ReplyConfig.untrusted)
+            return
+        }
+        logger.info("开始装填")
+        boot(Runnable {
+            val req: MutableMap<String, Any?> = HashMap()
+            req[ParamsConstant.R18] = 0
+            req[ParamsConstant.NUM] = 2
+            req[ParamsConstant.TAG] = "";
+            req[ParamsConstant.SIZE] = PluginConfig.size.name.lowercase()
+            val imageUrls: List<String> = ImageSourceManager.getInstance()?.getImageUrls(req)
+                    ?.filterNotNull()
+                    ?: emptyList()
+
+
+            val images = ArrayList();
+            
+            for (imageUrl in imageUrls) {
+                    runCatching {
+                        logger.info(imageUrl)
+                        val stream = getImageInputStream(imageUrl)
+                        val image = contact.uploadImage(stream)
+                        images.add(image)
+                        stream
+                    }.onFailure {
+                        logger.error(it)
+                    }.onSuccess {
+                        runInterruptible(Dispatchers.IO) {
+                            it.close()
+                        }
+                    }
+            }
+
+            ImageCachedPool.getInstance().putImage(images ,req);
+            
+        }, Runnable { 
+            val req: MutableMap<String, Any?> = HashMap()
+            req[ParamsConstant.R18] = 1
+            req[ParamsConstant.NUM] = 2
+            req[ParamsConstant.TAG] = "";
+            req[ParamsConstant.SIZE] = PluginConfig.size.name.lowercase()
+            val imageUrls: List<String> = ImageSourceManager.getInstance()?.getImageUrls(req)
+                    ?.filterNotNull()
+                    ?: emptyList()
+
+
+            val images = ArrayList();
+            
+            for (imageUrl in imageUrls) {
+                    runCatching {
+                        logger.info(imageUrl)
+                        val stream = getImageInputStream(imageUrl)
+                        val image = contact.uploadImage(stream)
+                        images.add(image)
+                        stream
+                    }.onFailure {
+                        logger.error(it)
+                    }.onSuccess {
+                        runInterruptible(Dispatchers.IO) {
+                            it.close()
+                        }
+                    }
+            }
+
+            ImageCachedPool.getInstance().putImage(images ,req);
+        
+        
+        
+        })
+        
+        sendMessage("开始加载缓存池，配置为" + str)
+    }
+
+
+    // @SubCommand("停止涩涩", "退膛")
+    // @Description("停止缓存池")
+    // suspend fun CommandSenderOnMessage<MessageEvent>.stopcache(reqNum: String = "") {
+    //     if (fromEvent !is GroupMessageEvent && fromEvent !is FriendMessageEvent)
+    //         return
+    //     if (fromEvent is GroupMessageEvent && !(fromEvent as GroupMessageEvent).sender.isOperator()) {
+    //         sendMessage(ReplyConfig.nonAdminPermissionDenied)
+    //         return
+    //     }
+    //     if (fromEvent is FriendMessageEvent && !this.hasPermission(trusted)) {
+    //         sendMessage(ReplyConfig.untrusted)
+    //         return
+    //     }
+    //     logger.info("停止装填")
+        
+    //     ImageCachedPool.instance.isActiveNow = false;
+    
+        
+    //     sendMessage("停止缓存池")
+    // }
 }

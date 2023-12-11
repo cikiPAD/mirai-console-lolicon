@@ -30,6 +30,7 @@ import io.github.samarium150.mirai.plugin.lolicon.util.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runInterruptible
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import net.mamoe.mirai.console.command.CommandSender
@@ -751,7 +752,7 @@ object Lolicon : CompositeCommand(
         }
         logger.info("开始装填")
         launch {
-        boot(Runnable {
+        ImageCachedPool.getInstance().boot(Runnable {
             val req: MutableMap<String, Any?> = HashMap()
             req[ParamsConstant.R18] = 0
             req[ParamsConstant.NUM] = 2
@@ -762,7 +763,7 @@ object Lolicon : CompositeCommand(
                     ?: emptyList()
 
 
-            images:List<Any> = ArrayList();
+            val images:List<Any> = ArrayList()
             
             for (imageUrl in imageUrls) {
                     runCatching {

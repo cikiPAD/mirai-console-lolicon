@@ -76,6 +76,11 @@ public class ImageCachedPool extends Thread {
         }
     }
 
+    public void clearCache() {
+        this.images =  new ConcurrentLinkedQueue<>();
+        this.imagesSp = new ConcurrentLinkedQueue<>();
+    }
+
     public void putImage(Object entities,Map<String, Object> params) {
         int r18 = (int) params.get(ParamsConstant.R18);
         if (r18 == 1) {

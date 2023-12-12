@@ -671,7 +671,7 @@ object Lolicon : CompositeCommand(
                             imageMsgBuilder.add(contact.bot, msg)
                         }
                         else {
-                            imageMsgBuilder.add(contact.bot, "类型转换失败,非图片类型")
+                            imageMsgBuilder.add(contact.bot, PlainText("类型转换失败,非图片类型"))
                         }
                     }
                     

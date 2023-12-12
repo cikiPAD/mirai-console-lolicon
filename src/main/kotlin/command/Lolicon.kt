@@ -658,7 +658,7 @@ object Lolicon : CompositeCommand(
                 
 
 
-                val cacheList: MutableList<Any> = ImageCachedPool.getInstance().getImageByParam(req)
+                val cacheList: List<Any> = ImageCachedPool.getInstance().getImageByParam(req)
                     ?.filterNotNull()
                     ?: emptyList()
                 

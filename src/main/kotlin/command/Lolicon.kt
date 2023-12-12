@@ -52,6 +52,7 @@ import net.mamoe.mirai.message.data.FlashImage
 import net.mamoe.mirai.message.data.ForwardMessageBuilder
 import net.mamoe.mirai.message.data.MessageChainBuilder
 import net.mamoe.mirai.message.data.PlainText
+import net.mamoe.mirai.message.data.Image
 import java.io.InputStream
 
 
@@ -665,7 +666,7 @@ object Lolicon : CompositeCommand(
                 if (cacheList.isNotEmpty()) {
                     
                     for (image in cacheList) {
-                        val message: Message? = image as? Message
+                        val message: Message? = image as? Image
                         if (message != null) {
                             imageMsgBuilder.add(contact.bot, message)
                         }

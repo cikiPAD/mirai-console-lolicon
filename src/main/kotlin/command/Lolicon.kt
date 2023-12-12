@@ -755,6 +755,7 @@ object Lolicon : CompositeCommand(
         val contact = subject as Contact
         
         ImageCachedPool.getInstance().boot(Runnable {
+            runBlocking {
             val req: MutableMap<String, Any?> = HashMap()
             req[ParamsConstant.R18] = 0
             req[ParamsConstant.NUM] = 2
@@ -778,14 +779,18 @@ object Lolicon : CompositeCommand(
                         logger.error(it)
                     }.onSuccess {
                        
-                        it.close()
+                        runInterruptible(Dispatchers.IO) {
+                            it.close()
+                        }
                         
                     }
             }
 
             ImageCachedPool.getInstance().putImage(images ,req);
+            }
             
         }, Runnable { 
+            runBlocking {
             val req: MutableMap<String, Any?> = HashMap()
             req[ParamsConstant.R18] = 1
             req[ParamsConstant.NUM] = 2
@@ -809,13 +814,15 @@ object Lolicon : CompositeCommand(
                         logger.error(it)
                     }.onSuccess {
                        
-                        it.close()
+                        runInterruptible(Dispatchers.IO) {
+                            it.close()
+                        }
                         
                     }
             }
 
             ImageCachedPool.getInstance().putImage(images ,req);
-    
+            }
         })
         
         

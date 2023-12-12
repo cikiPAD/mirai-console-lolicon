@@ -731,6 +731,7 @@ object Lolicon : CompositeCommand(
         }
         logger.info("set 图库 to $type")
         if(ImageSourceManager.getInstance().setCurrentType(type)) {
+            ImageCachedPool.getInstance().clearCache()
             sendMessage("成功设置图库为$type")
         }
         else {

@@ -132,7 +132,7 @@ public class ImageCachedPool extends Thread {
         while(isRunning) {
 
             try {
-                System.out.println("开始填充");
+                //System.out.println("开始填充");
                 while (isActiveNow) {
                     Thread.sleep(1000);
                     if (images.size() < size) {

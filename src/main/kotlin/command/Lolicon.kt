@@ -51,8 +51,6 @@ import net.mamoe.mirai.message.data.ForwardMessageBuilder
 import net.mamoe.mirai.message.data.MessageChainBuilder
 import net.mamoe.mirai.message.data.PlainText
 import java.io.InputStream
-import java.util.List;
-import java.util.ArrayList;
 
 
 object Lolicon : CompositeCommand(

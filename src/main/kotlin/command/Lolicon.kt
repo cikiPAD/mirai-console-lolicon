@@ -651,7 +651,6 @@ object Lolicon : CompositeCommand(
             val notificationReceipt = getNotificationReceipt()
             
             if (subject != null && PluginConfig.messageType == PluginConfig.Type.Forward) {
-                val allTimeStart = System.currentTimeMillis()
                 val contact = subject as Contact
                 val imageMsgBuilder = ForwardMessageBuilder(contact)
                 imageMsgBuilder.displayStrategy = CustomDisplayStrategy
@@ -671,6 +670,7 @@ object Lolicon : CompositeCommand(
                     
                 }
                 else {
+                    val allTimeStart = System.currentTimeMillis()
                 
                     //imageMsgBuilder.add(contact.bot, PlainText(imageData.toReadable(imageData.urls)))
                     val getUrlStart = System.currentTimeMillis()
@@ -711,6 +711,8 @@ object Lolicon : CompositeCommand(
                     }
 
                     val uploadTime = System.currentTimeMillis() - uploadStart
+                    val allTime = System.currentTimeMillis() - allTimeStart;
+                    logger.info("总共耗时$allTime ms, 调用图片api接口耗时$getUrlTime ms, 下载上传图片总共耗时$uploadTime ms, 下载图片合计耗时$onlyDownloadTime ms, 上传图片合计耗时$onlyUploadTime ms")
 
                 }
                                 
@@ -723,8 +725,6 @@ object Lolicon : CompositeCommand(
                     recall(RecallType.IMAGE, imgReceipt, recall)
                 if (cooldown > 0)
                     cooldown(subject, cooldown)
-                val allTime = System.currentTimeMillis() - allTimeStart;
-                logger.info("总共耗时$allTime ms, 调用图片api接口耗时$getUrlTime ms, 下载上传图片总共耗时$uploadTime ms, 下载图片合计耗时$onlyDownloadTime ms, 上传图片合计耗时$onlyUploadTime ms")
              }
             
         }

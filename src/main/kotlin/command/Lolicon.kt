@@ -656,7 +656,12 @@ object Lolicon : CompositeCommand(
                 val imageMsgBuilder = ForwardMessageBuilder(contact)
                 imageMsgBuilder.displayStrategy = CustomDisplayStrategy
                 
-                    
+
+
+                val cacheList: MutableList<Any> = ImageCachedPool.getInstance().getImageByParam(req)
+                    ?.filterNotNull()
+                    ?: emptyList()
+                
                 //imageMsgBuilder.add(contact.bot, PlainText(imageData.toReadable(imageData.urls)))
                 val getUrlStart = System.currentTimeMillis()
                 val imageUrls: List<String> = ImageSourceManager.getInstance()?.getImageUrls(req)

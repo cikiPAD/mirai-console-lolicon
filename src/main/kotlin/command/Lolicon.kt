@@ -751,6 +751,7 @@ object Lolicon : CompositeCommand(
             return
         }
         logger.info("开始装填")
+        val contact = subject as Contact
         launch {
         ImageCachedPool.getInstance().boot(Runnable {
             val req: MutableMap<String, Any?> = HashMap()
@@ -794,7 +795,7 @@ object Lolicon : CompositeCommand(
                     ?: emptyList()
 
 
-            val images = ArrayList();
+            val images:List<Any> = ArrayList()
             
             for (imageUrl in imageUrls) {
                     runCatching {

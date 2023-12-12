@@ -664,8 +664,11 @@ object Lolicon : CompositeCommand(
 
                 if (cacheList.isNotEmpty()) {
                     
-                    cacheList.forEach { image ->
-                        imageMsgBuilder.add(contact.bot, image)
+                    for (image in cacheList) {
+                        val message: Message? = image as? Message
+                        if (message != null) {
+                            imageMsgBuilder.add(contact.bot, message)
+                        }
                     }
                     
                 }

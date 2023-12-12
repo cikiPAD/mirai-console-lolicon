@@ -666,9 +666,12 @@ object Lolicon : CompositeCommand(
                 if (cacheList.isNotEmpty()) {
                     
                     for (image in cacheList) {
-                        val message: Message? = image as? Image
-                        if (message != null) {
-                            imageMsgBuilder.add(contact.bot, message)
+                        val msg: Image? = image as? Image
+                        if (msg != null) {
+                            imageMsgBuilder.add(contact.bot, msg)
+                        }
+                        else {
+                            imageMsgBuilder.add(contact.bot, "类型转换失败,非图片类型")
                         }
                     }
                     

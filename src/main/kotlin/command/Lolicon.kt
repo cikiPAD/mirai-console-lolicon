@@ -659,7 +659,8 @@ object Lolicon : CompositeCommand(
 
 
                 val cacheList: List<Any> = ImageCachedPool.getInstance().getImageByParam(req)
-                    ?.filterNotNull()
+                    ?.let { it as? List<Any> }
+                    ?.filterIsInstance<Any>()
                     ?: emptyList()
                 
                 //imageMsgBuilder.add(contact.bot, PlainText(imageData.toReadable(imageData.urls)))

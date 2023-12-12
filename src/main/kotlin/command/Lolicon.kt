@@ -765,7 +765,7 @@ object Lolicon : CompositeCommand(
                     ?: emptyList()
 
 
-            val images:List<Any> = ArrayList()
+            val images: MutableList<Any> = mutableListOf()
             
             for (imageUrl in imageUrls) {
                     runCatching {
@@ -796,7 +796,7 @@ object Lolicon : CompositeCommand(
                     ?: emptyList()
 
 
-            val images:List<Any> = ArrayList()
+            val images: MutableList<Any> = mutableListOf()
             
             for (imageUrl in imageUrls) {
                     runCatching {

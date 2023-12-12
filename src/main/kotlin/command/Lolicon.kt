@@ -753,7 +753,7 @@ object Lolicon : CompositeCommand(
         }
         logger.info("开始装填")
         val contact = subject as Contact
-        launch {
+        
         ImageCachedPool.getInstance().boot(Runnable {
             val req: MutableMap<String, Any?> = HashMap()
             req[ParamsConstant.R18] = 0
@@ -777,9 +777,9 @@ object Lolicon : CompositeCommand(
                     }.onFailure {
                         logger.error(it)
                     }.onSuccess {
-                        runInterruptible(Dispatchers.IO) {
-                            it.close()
-                        }
+                       
+                        it.close()
+                        
                     }
             }
 
@@ -808,16 +808,16 @@ object Lolicon : CompositeCommand(
                     }.onFailure {
                         logger.error(it)
                     }.onSuccess {
-                        runInterruptible(Dispatchers.IO) {
-                            it.close()
-                        }
+                       
+                        it.close()
+                        
                     }
             }
 
             ImageCachedPool.getInstance().putImage(images ,req);
     
         })
-        }
+        
         
         sendMessage("开始加载缓存池")
     }

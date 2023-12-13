@@ -23,17 +23,45 @@ import java.util.Map;
  */
 public class LoliHttpClient {
 
+    private static CloseableHttpClient normalClient = null;
+
+    private static CloseableHttpClient sslClient = null;
+
+    public static void init() {
+        normalClient = HttpClients.createDefault();
+        try {
+            sslClient = new SSLClient();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void shutdown() {
+        if (normalClient != null) {
+            try {
+                normalClient.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (sslClient != null) {
+            try {
+                sslClient.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
     public static String postForBody(String url, String json,Map<String,String> headerMap) {
 
         CloseableHttpResponse response = null;
         String content = null;
-        CloseableHttpClient httpclient = HttpClients.createDefault();
+        CloseableHttpClient httpclient = normalClient;
         if(url.startsWith("https")) {
-            try {
-                httpclient = new SSLClient();
-            } catch (Exception e) {
-
-            }
+            httpclient = sslClient;
         }
         try {
 
@@ -54,13 +82,11 @@ public class LoliHttpClient {
             content = getBody(response);
 
         } catch (ClientProtocolException e) {
+            e.printStackTrace();
         } catch (IOException e) {
-        } finally {
-            try {
-                httpclient.close();
-            } catch (IOException e) {
-            }
+            e.printStackTrace();
         }
+
         return content;
     }
 
@@ -72,6 +98,7 @@ public class LoliHttpClient {
                 content = EntityUtils.toString(response.getEntity());
                 return content;
             }catch (Exception e) {
+                e.printStackTrace();
             }
         }
 
@@ -80,12 +107,9 @@ public class LoliHttpClient {
 
     public static String get(String url,String authorizationKeyName,String authorization) {
         String content = null;
-        CloseableHttpClient httpclient = HttpClients.createDefault();
+        CloseableHttpClient httpclient = normalClient;
         if(url.startsWith("https")) {
-            try {
-                httpclient = new SSLClient();
-            } catch (Exception e) {
-            }
+            httpclient = sslClient;
         }
         try {
 
@@ -96,25 +120,20 @@ public class LoliHttpClient {
             CloseableHttpResponse response = httpclient.execute(httpget);
             content = getBody(response);
         } catch (ClientProtocolException e) {
+            e.printStackTrace();
         } catch (IOException e) {
-        } finally {
-            try {
-                httpclient.close();
-            } catch (IOException e) {
-            }
+            e.printStackTrace();
         }
+
         return content;
     }
 
 
     public static String get(String url,Map<String, String> headers) {
         String content = null;
-        CloseableHttpClient httpclient = HttpClients.createDefault();
+        CloseableHttpClient httpclient = normalClient;
         if(url.startsWith("https")) {
-            try {
-                httpclient = new SSLClient();
-            } catch (Exception e) {
-            }
+            httpclient = sslClient;
         }
         try {
 
@@ -126,12 +145,9 @@ public class LoliHttpClient {
             CloseableHttpResponse response = httpclient.execute(httpget);
             content = getBody(response);
         } catch (ClientProtocolException e) {
+            e.printStackTrace();
         } catch (IOException e) {
-        } finally {
-            try {
-                httpclient.close();
-            } catch (IOException e) {
-            }
+            e.printStackTrace();
         }
         return content;
     }

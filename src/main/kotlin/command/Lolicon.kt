@@ -812,7 +812,7 @@ object Lolicon : CompositeCommand(
                     }
             }
 
-            ImageCachedPool.getInstance().putImage(images ,req);
+            ImageCachedPool.getInstance().putImageNormal(images);
             }
             
         }, Runnable { 
@@ -847,7 +847,7 @@ object Lolicon : CompositeCommand(
                     }
             }
 
-            ImageCachedPool.getInstance().putImage(images ,req);
+            ImageCachedPool.getInstance().putImageSp(images);
             }
         })
         

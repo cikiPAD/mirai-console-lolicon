@@ -86,14 +86,30 @@ public class ImageCachedPool extends Thread {
         if (r18 == 1) {
             imagesSp.offer(entities);
             if (imagesSp.size()>size*2) {
-                System.out.println("imagesSp超载,数量"+ size);
+                System.out.println("imagesSp超载,数量"+ imagesSp.size());
             }
         }
         else {
             images.offer(entities);
             if (images.size()>size*2) {
-                System.out.println("images超载,数量"+ size);
+                System.out.println("images超载,数量"+ images.size());
             }
+        }
+    }
+
+
+    public void putImageNormal(Object entities) {
+        images.offer(entities);
+        if (images.size()>size*2) {
+            System.out.println("images超载,数量"+ images.size());
+        }
+        
+    }
+
+    public void putImageSp(Object entities) {
+        imagesSp.offer(entities);
+        if (imagesSp.size()>size*2) {
+            System.out.println("imagesSp超载,数量"+ imagesSp.size());
         }
     }
 
@@ -134,6 +150,14 @@ public class ImageCachedPool extends Thread {
             try {
                 
                 while (isActiveNow) {
+
+                    loopCount++;
+                    //避免频繁上传，连续循环5次就关闭
+                    System.out.println("填充循环计数count:" + loopCount);
+                    if (loopCount >= size) {
+                        isActiveNow = false;
+                    }
+                    
                     Thread.sleep(1000);
                     if (images.size() < size) {
                         long startTime = System.currentTimeMillis();
@@ -150,13 +174,12 @@ public class ImageCachedPool extends Thread {
                         Thread.sleep(500);
                         System.out.println(String.format("填充特殊图库执行结束,耗时%s ms,当前缓存大小: %s", (System.currentTimeMillis() - startTime)+ "", imagesSp.size() + "" ));
                     }
-                    loopCount++;
-                    //避免频繁上传，连续循环5次就关闭
-                    System.out.println("循环计数count:" + loopCount);
-                    if (loopCount >= size) {
+                    
+                    
+                    if (isActiveNow == false) {
                         System.out.println("停止填充");
-                        isActiveNow = false;
                     }
+                    
                 }
             }
             catch(Exception e) {

@@ -486,11 +486,11 @@ object Lolicon : CompositeCommand(
     suspend fun CommandSenderOnMessage<MessageEvent>.set(property: PluginData.Property, value: Int) {
         if (fromEvent !is GroupMessageEvent && fromEvent !is FriendMessageEvent)
             return
-        if (fromEvent is GroupMessageEvent && !(fromEvent as GroupMessageEvent).sender.isOperator()) {
-            sendMessage(ReplyConfig.nonAdminPermissionDenied)
-            return
-        }
-        if (fromEvent is FriendMessageEvent && !this.hasPermission(trusted)) {
+        // if (fromEvent is GroupMessageEvent && !(fromEvent as GroupMessageEvent).sender.isOperator()) {
+        //     sendMessage(ReplyConfig.nonAdminPermissionDenied)
+        //     return
+        // }
+        if (!this.hasPermission(trusted)) {
             sendMessage(ReplyConfig.untrusted)
             return
         }

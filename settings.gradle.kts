@@ -5,4 +5,4 @@ pluginManagement {
         mavenCentral()
     }
 }
-rootProject.name = "mirai-console-lolicon-cikipad-java"
+rootProject.name = "mirai-console-lolicon"

@@ -54,48 +54,87 @@ public class ImageCachedPool extends Thread {
      * @throws InterruptedException
      * @throws FileNotFoundException
      */
-    public Object getImageByParam(Map<String, Object> params) {
+//    public Object getImageByParam(Map<String, Object> params) {
+//        String tag = (String) params.get(ParamsConstant.TAG);
+//        int num = (int) params.get(ParamsConstant.NUM);
+//        int r18 = (int) params.get(ParamsConstant.R18);
+//        //2张图片，且不带tag
+//        if (num == 2 && (tag == null || tag.trim().length() == 0)) {
+//            if (r18 == 1) {
+//                Object ret =  imagesSp.poll();
+//                startRun();
+//                return ret;
+//            }
+//            else {
+//                Object ret = images.poll();
+//                startRun();
+//                return ret;
+//            }
+//        }
+//        else {
+//            return null;
+//        }
+//    }
+
+
+
+    public Object getImageByParamNormal(Map<String, Object> params) {
         String tag = (String) params.get(ParamsConstant.TAG);
         int num = (int) params.get(ParamsConstant.NUM);
-        int r18 = (int) params.get(ParamsConstant.R18);
         //2张图片，且不带tag
         if (num == 2 && (tag == null || tag.trim().length() == 0)) {
-            if (r18 == 1) {
-                Object ret =  imagesSp.poll();
-                startRun();
-                return ret;
-            }
-            else {
-                Object ret = images.poll();
-                startRun();
-                return ret;
-            }
+            Object ret = images.poll();
+            startRun();
+            return ret;
         }
         else {
             return null;
         }
     }
 
-    public void clearCache() {
-        this.images =  new ConcurrentLinkedQueue<>();
+
+    public Object getImageByParamSp(Map<String, Object> params) {
+        String tag = (String) params.get(ParamsConstant.TAG);
+        int num = (int) params.get(ParamsConstant.NUM);
+        //2张图片，且不带tag
+        if (num == 2 && (tag == null || tag.trim().length() == 0)) {
+            Object ret =  imagesSp.poll();
+            startRun();
+            return ret;
+        }
+        else {
+            return null;
+        }
+    }
+
+//    public void clearCache() {
+//        this.images =  new ConcurrentLinkedQueue<>();
+//        this.imagesSp = new ConcurrentLinkedQueue<>();
+//    }
+
+    public void clearCacheNormal() {
+        this.images = new ConcurrentLinkedQueue<>();
+    }
+
+    public void clearCacheSp() {
         this.imagesSp = new ConcurrentLinkedQueue<>();
     }
 
-    public void putImage(Object entities,Map<String, Object> params) {
-        int r18 = (int) params.get(ParamsConstant.R18);
-        if (r18 == 1) {
-            imagesSp.offer(entities);
-            if (imagesSp.size()>size*2) {
-                System.out.println("imagesSp超载,数量"+ imagesSp.size());
-            }
-        }
-        else {
-            images.offer(entities);
-            if (images.size()>size*2) {
-                System.out.println("images超载,数量"+ images.size());
-            }
-        }
-    }
+//    public void putImage(Object entities,Map<String, Object> params) {
+//        int r18 = (int) params.get(ParamsConstant.R18);
+//        if (r18 == 1) {
+//            imagesSp.offer(entities);
+//            if (imagesSp.size()>size*2) {
+//                System.out.println("imagesSp超载,数量"+ imagesSp.size());
+//            }
+//        }
+//        else {
+//            images.offer(entities);
+//            if (images.size()>size*2) {
+//                System.out.println("images超载,数量"+ images.size());
+//            }
+//        }
+//    }
 
 
     public void putImageNormal(Object entities) {

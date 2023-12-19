@@ -903,6 +903,67 @@ object Lolicon : CompositeCommand(
     }
 
 
+    @SubCommand("setAdd", "设置缓存")
+    @Description("设置属性, 详见帮助信息")
+    suspend fun CommandSenderOnMessage<MessageEvent>.set(key: String, value: String) {
+        if (fromEvent !is GroupMessageEvent && fromEvent !is FriendMessageEvent)
+            return
+        if (!this.hasPermission(trusted)) {
+            sendMessage(ReplyConfig.untrusted)
+            return
+        }
+        logger.info("set $key to $value")
+        if (value < 0) {
+            sendMessage(value.toString() + ReplyConfig.illegalValue)
+            return
+        }
+
+        var isSp = false
+        if (fromEvent is FriendMessageEvent) {
+            isSp = true
+        }
+
+        if (isSp) {
+            ImageSourceManager.getInstance().putAdditionParamSp(key, value)
+            sendMessage("成功设置特殊图库缓存属性$key 为 $value")
+        }
+        else {
+            ImageSourceManager.getInstance().putAdditionParamNormal(key, value)
+            sendMessage("成功设置普通图库缓存属性$key 为 $value")
+        }
+        
+    }
+
+    @SubCommand("clearAdd", "清除缓存设置")
+    @Description("设置属性, 详见帮助信息")
+    suspend fun CommandSenderOnMessage<MessageEvent>.set(reqNum: String = "") {
+        if (fromEvent !is GroupMessageEvent && fromEvent !is FriendMessageEvent)
+            return
+        if (!this.hasPermission(trusted)) {
+            sendMessage(ReplyConfig.untrusted)
+            return
+        }
+        logger.info("clear cache config")
+        if (value < 0) {
+            sendMessage(value.toString() + ReplyConfig.illegalValue)
+            return
+        }
+        var isSp = false
+        if (fromEvent is FriendMessageEvent) {
+            isSp = true
+        }
+
+        if (isSp) {
+            ImageSourceManager.getInstance().clearAdditionParamSp()
+            sendMessage("成功清理特殊图库缓存属性")
+        }
+        else {
+            ImageSourceManager.getInstance().clearAdditionParamNormal()
+            sendMessage("成功清理普通图库缓存属性")
+        }
+    }
+
+
     // @SubCommand("停止涩涩", "退膛")
     // @Description("停止缓存池")
     // suspend fun CommandSenderOnMessage<MessageEvent>.stopcache(reqNum: String = "") {

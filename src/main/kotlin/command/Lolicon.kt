@@ -774,8 +774,23 @@ object Lolicon : CompositeCommand(
 
         
         logger.info("set 图库 to $type")
-        if(ImageSourceManager.getInstance().setCurrentType(type)) {
-            ImageCachedPool.getInstance().clearCache()
+
+        var isSucc = false
+
+        if (isSp) {
+            isSucc = ImageSourceManager.getInstance().setCurrentTypeSp(type)
+        }
+        else {
+            isSucc = ImageSourceManager.getInstance().setCurrentTypeNormal(type)
+        }
+        
+        if(isSucc) {
+            if (isSp) {
+                ImageCachedPool.getInstance().clearCacheSp()
+            }
+            else {
+                ImageCachedPool.getInstance().clearCacheNormal()
+            }
             ImageCachedPool.getInstance().startRun()
             sendMessage("成功设置图库为$type")
         }
@@ -809,7 +824,7 @@ object Lolicon : CompositeCommand(
             req[ParamsConstant.NUM] = 2
             req[ParamsConstant.TAG] = "";
             req[ParamsConstant.SIZE] = PluginConfig.size.name.lowercase()
-            val imageUrls: List<String> = ImageSourceManager.getInstance()?.getImageUrls(req)
+            val imageUrls: List<String> = ImageSourceManager.getInstance()?.getImageUrlsNormal(req)
                     ?.filterNotNull()
                     ?: emptyList()
 
@@ -844,7 +859,7 @@ object Lolicon : CompositeCommand(
             req[ParamsConstant.NUM] = 2
             req[ParamsConstant.TAG] = "";
             req[ParamsConstant.SIZE] = PluginConfig.size.name.lowercase()
-            val imageUrls: List<String> = ImageSourceManager.getInstance()?.getImageUrls(req)
+            val imageUrls: List<String> = ImageSourceManager.getInstance()?.getImageUrlsSp(req)
                     ?.filterNotNull()
                     ?: emptyList()
 

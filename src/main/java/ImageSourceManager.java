@@ -18,7 +18,10 @@ public class ImageSourceManager {
 
     public static ImageSourceManager instance = new ImageSourceManager();
 
-    private String currentType = SourceTypeConstant.NYAN;
+    private String currentTypeNormal = SourceTypeConstant.NYAN;
+
+    private String currentTypeSp = SourceTypeConstant.NYAN;
+
 
 
     private ImageSourceManager() {
@@ -70,10 +73,26 @@ public class ImageSourceManager {
     }
 
 
-    public List<String> getImageUrls(Map<String, Object> params) {
+    
+
+    public List<String> getImageUrlsNormal(Map<String, Object> params) {
         try {
-            if (sources.containsKey(currentType)) {
-                return sources.get(currentType).getImageUrl(filterNullValues(params));
+            if (sources.containsKey(currentTypeNormal)) {
+                return sources.get(currentTypeNormal).getImageUrl(filterNullValues(params));
+            } else {
+                return new ArrayList<>();
+            }
+        }
+        catch (Exception e){
+            return new ArrayList<>();
+        }
+    }
+
+
+    public List<String> getImageUrlsSp(Map<String, Object> params) {
+        try {
+            if (sources.containsKey(currentTypeSp)) {
+                return sources.get(currentTypeSp).getImageUrl(filterNullValues(params));
             } else {
                 return new ArrayList<>();
             }
@@ -100,14 +119,21 @@ public class ImageSourceManager {
         return filteredParams;
     }
 
+    
 
-    public String getCurrentType() {
-        return currentType;
+    public boolean setCurrentTypeNormal(String type) {
+        if (sources.containsKey(type)) {
+            currentTypeNormal = type;
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
-    public boolean setCurrentType(String type) {
+    public boolean setCurrentTypeSp(String type) {
         if (sources.containsKey(type)) {
-            currentType = type;
+            currentTypeSp = type;
             return true;
         }
         else {

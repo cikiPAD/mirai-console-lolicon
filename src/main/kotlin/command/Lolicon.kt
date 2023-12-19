@@ -695,9 +695,19 @@ object Lolicon : CompositeCommand(
                 
                     //imageMsgBuilder.add(contact.bot, PlainText(imageData.toReadable(imageData.urls)))
                     val getUrlStart = System.currentTimeMillis()
-                    val imageUrls: List<String> = ImageSourceManager.getInstance()?.getImageUrls(req)
+
+                    val imageUrls: List<String> = emptyList()
+                    if (isSp) {
+                        imageUrls = ImageSourceManager.getInstance()?.getImageUrlsSp(req)
                         ?.filterNotNull()
                         ?: emptyList()
+                    }
+                    else {
+                        imageUrls = ImageSourceManager.getInstance()?.getImageUrlsNormal(req)
+                        ?.filterNotNull()
+                        ?: emptyList()
+                    }
+                    
 
                     val getUrlTime = System.currentTimeMillis() - getUrlStart
 

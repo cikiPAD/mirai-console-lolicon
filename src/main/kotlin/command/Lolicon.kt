@@ -625,7 +625,7 @@ object Lolicon : CompositeCommand(
 
     @SubCommand("搞快点", "gkd")
     @Description("使用多个图库查询涩图")
-    suspend fun CommandSender.someimagescache(json: String = "") {
+    suspend fun CommandSenderOnMessage<MessageEvent>.someimagescache(json: String = "") {
         val mutex = getSubjectMutex(subject) ?: return
         if (mutex.isLocked) {
             logger.info("throttled")

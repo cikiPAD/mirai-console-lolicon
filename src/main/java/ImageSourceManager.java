@@ -131,11 +131,17 @@ public class ImageSourceManager {
     }
 
     public void putAdditionParamNormal(String key, Object value) {
+        if (key == null || value == null) {
+            return;
+        }
         Object legalValue = castSomeValue(key, value);
         additionParamNormal.put(key, legalValue);
     }
 
     public void putAdditionParamSp(String key, Object value) {
+        if (key == null || value == null) {
+            return;
+        }
         Object legalValue = castSomeValue(key, value);
         additionParamSp.put(key, legalValue);
     }

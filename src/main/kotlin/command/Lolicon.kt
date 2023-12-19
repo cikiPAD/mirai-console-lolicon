@@ -764,7 +764,7 @@ object Lolicon : CompositeCommand(
 
     @SubCommand("setSource", "设置图库")
     @Description("设置图库, 详见帮助信息")
-    suspend fun CommandSenderOnMessage<MessageEvent>.set(type: String = "") {
+    suspend fun CommandSenderOnMessage<MessageEvent>.setSourceType(type: String = "") {
         if (fromEvent !is GroupMessageEvent && fromEvent !is FriendMessageEvent)
             return
         if (fromEvent is GroupMessageEvent && !(fromEvent as GroupMessageEvent).sender.isOperator()) {

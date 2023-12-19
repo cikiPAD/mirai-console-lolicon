@@ -650,6 +650,11 @@ object Lolicon : CompositeCommand(
             }
             req[ParamsConstant.SIZE] = PluginConfig.size.name.lowercase()
             val notificationReceipt = getNotificationReceipt()
+
+            var isSp = false
+            if (fromEvent is FriendMessageEvent) {
+                isSp = true
+            }
             
             if (subject != null && PluginConfig.messageType == PluginConfig.Type.Forward) {
                 val contact = subject as Contact
@@ -657,11 +662,20 @@ object Lolicon : CompositeCommand(
                 imageMsgBuilder.displayStrategy = CustomDisplayStrategy
                 
 
-
-                val cacheList: List<Any> = ImageCachedPool.getInstance().getImageByParam(req)
+                var cacheList: List<Any> = emptyList()
+                
+                if (isSp) {
+                    cacheList = ImageCachedPool.getInstance().getImageByParamSp(req)
                     ?.let { it as? List<Any> }
                     ?.filterIsInstance<Any>()
                     ?: emptyList()
+                } else {
+                    cacheList = ImageCachedPool.getInstance().getImageByParamNormal(req)
+                    ?.let { it as? List<Any> }
+                    ?.filterIsInstance<Any>()
+                    ?: emptyList()
+                }
+               
 
                 if (cacheList.isNotEmpty()) {
                     
@@ -751,6 +765,14 @@ object Lolicon : CompositeCommand(
             sendMessage(ReplyConfig.untrusted)
             return
         }
+
+       
+        var isSp = false
+        if (fromEvent is FriendMessageEvent) {
+            isSp = true
+        }
+
+        
         logger.info("set 图库 to $type")
         if(ImageSourceManager.getInstance().setCurrentType(type)) {
             ImageCachedPool.getInstance().clearCache()

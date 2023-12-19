@@ -913,10 +913,7 @@ object Lolicon : CompositeCommand(
             return
         }
         logger.info("set $key to $value")
-        if (value < 0) {
-            sendMessage(value.toString() + ReplyConfig.illegalValue)
-            return
-        }
+        
 
         var isSp = false
         if (fromEvent is FriendMessageEvent) {
@@ -944,10 +941,7 @@ object Lolicon : CompositeCommand(
             return
         }
         logger.info("clear cache config")
-        if (value < 0) {
-            sendMessage(value.toString() + ReplyConfig.illegalValue)
-            return
-        }
+
         var isSp = false
         if (fromEvent is FriendMessageEvent) {
             isSp = true

@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 多个文件来源的统一入口
@@ -22,6 +23,9 @@ public class ImageSourceManager {
 
     private String currentTypeSp = SourceTypeConstant.NYAN;
 
+    private Map<String, Object> additionParamNormal = new ConcurrentHashMap<>();
+
+    private Map<String, Object> additionParamSp = new ConcurrentHashMap<>();
 
 
     private ImageSourceManager() {
@@ -73,10 +77,18 @@ public class ImageSourceManager {
     }
 
 
-    
+
 
     public List<String> getImageUrlsNormal(Map<String, Object> params) {
         try {
+
+            if (!additionParamNormal.isEmpty()) {
+                for (String paramKey:additionParamNormal.keySet()) {
+                    params.put(paramKey, additionParamNormal.get(paramKey));
+                }
+            }
+
+
             if (sources.containsKey(currentTypeNormal)) {
                 return sources.get(currentTypeNormal).getImageUrl(filterNullValues(params));
             } else {
@@ -91,6 +103,14 @@ public class ImageSourceManager {
 
     public List<String> getImageUrlsSp(Map<String, Object> params) {
         try {
+
+            if (!additionParamSp.isEmpty()) {
+                for (String paramKey:additionParamSp.keySet()) {
+                    params.put(paramKey, additionParamSp.get(paramKey));
+                }
+            }
+
+
             if (sources.containsKey(currentTypeSp)) {
                 return sources.get(currentTypeSp).getImageUrl(filterNullValues(params));
             } else {
@@ -102,6 +122,23 @@ public class ImageSourceManager {
         }
     }
 
+    public void clearAdditionParamNormal() {
+        additionParamNormal = new ConcurrentHashMap<>();
+    }
+
+    public void clearAdditionParamSp() {
+        additionParamSp = new ConcurrentHashMap<>();
+    }
+
+    public void putAdditionParamNormal(String key, Object value) {
+        Object legalValue = castSomeValue(key, value);
+        additionParamNormal.put(key, legalValue);
+    }
+
+    public void putAdditionParamSp(String key, Object value) {
+        Object legalValue = castSomeValue(key, value);
+        additionParamSp.put(key, legalValue);
+    }
 
 
     public static Map<String, Object> filterNullValues(Map<String, Object> params) {
@@ -119,7 +156,7 @@ public class ImageSourceManager {
         return filteredParams;
     }
 
-    
+
 
     public boolean setCurrentTypeNormal(String type) {
         if (sources.containsKey(type)) {
@@ -143,6 +180,24 @@ public class ImageSourceManager {
 
     public String getAllType() {
         return String.join(",",sources.keySet());
+    }
+
+
+    public Object castSomeValue(String key, Object value) {
+        if (ParamsConstant.NUM.equalsIgnoreCase(key)) {
+            int num = Integer.valueOf((String) value);
+            if (num<=0 || num > 10) {
+                System.out.println("num数量非法，设置为2");
+                num = 2;
+            }
+            return num;
+        }
+
+        if (ParamsConstant.R18.equalsIgnoreCase(key)) {
+            int r18 = Integer.valueOf((String) value);
+            return r18;
+        }
+        return value;
     }
 
 

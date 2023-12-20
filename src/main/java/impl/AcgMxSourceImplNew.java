@@ -83,10 +83,17 @@ public class AcgMxSourceImplNew implements ImageSourceInterface {
 
             List<Map<String, Object>> metaPages = (List<Map<String, Object>>) one.get("meta_pages");
             if (metaPages!=null && !metaPages.isEmpty()) {
+
+                int meta_pages_count = 0;
+
                 for (Map<String, Object> onePage: metaPages) {
                     String oneUrl = getUrlFromImageUrls((Map<String, Object>)(onePage.get("image_urls")), params);
                     if (oneUrl!=null & oneUrl.length()!=0) {
                         ret.add(oneUrl);
+                        meta_pages_count++;
+                    }
+                    if (meta_pages_count >= 3) {
+                        break;
                     }
                 }
             }

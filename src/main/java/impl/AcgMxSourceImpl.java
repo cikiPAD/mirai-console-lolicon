@@ -173,12 +173,24 @@ public class AcgMxSourceImpl implements ImageSourceInterface {
         List<String> ret = new ArrayList<>();
         for (String url:urls) {
             String tmp = url.replace(ParamsConstant.ORI_HOST, ParamsConstant.PROXY_HOST);
-            ret.add(tmp);
+            ret.add(processURL(tmp));
         }
         return ret;
 
+    }
 
+    public static String processURL(String url) {
+        String prefixToRemove = "/c/";
+        int prefixIndex = url.indexOf(prefixToRemove);
 
+        if (prefixIndex != -1) {
+            int endIndex = url.indexOf('/', prefixIndex + prefixToRemove.length());
+            if (endIndex != -1) {
+                return url.substring(0, prefixIndex) + url.substring(endIndex);
+            }
+        }
+
+        return url;
     }
 
 

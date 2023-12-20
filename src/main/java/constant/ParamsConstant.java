@@ -21,5 +21,13 @@ public class ParamsConstant {
 
     public static final String PROXY_HOST = "i.pixiv.re";
 
+    public static final String ORI_HOST = "i.pximg.net";
+
     public static final int CACHE_LIMIT = 5;
+
+    public static final String ACGMX_MODE = "mode";
+
+    public static final String ACGMX_DEFAULT_MODE = "day";
+
+    public static final String ACGMX_DATE = "date";
 }

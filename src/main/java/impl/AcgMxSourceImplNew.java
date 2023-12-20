@@ -24,7 +24,7 @@ public class AcgMxSourceImplNew implements ImageSourceInterface {
 
     @Override
     public String getType() {
-        return SourceTypeConstant.ACGMX;
+        return SourceTypeConstant.ACGMX_NEW;
     }
 
     @Override

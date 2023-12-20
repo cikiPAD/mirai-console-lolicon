@@ -698,12 +698,12 @@ object Lolicon : CompositeCommand(
 
                     var imageUrls: List<String> = emptyList()
                     if (isSp) {
-                        imageUrls = ImageSourceManager.getInstance()?.getImageUrlsSp(req)
+                        imageUrls = ImageSourceManager.getInstance()?.getImageUrlsSp(req, false)
                         ?.filterNotNull()
                         ?: emptyList()
                     }
                     else {
-                        imageUrls = ImageSourceManager.getInstance()?.getImageUrlsNormal(req)
+                        imageUrls = ImageSourceManager.getInstance()?.getImageUrlsNormal(req, false)
                         ?.filterNotNull()
                         ?: emptyList()
                     }
@@ -834,7 +834,7 @@ object Lolicon : CompositeCommand(
             req[ParamsConstant.NUM] = 2
             req[ParamsConstant.TAG] = "";
             req[ParamsConstant.SIZE] = PluginConfig.size.name.lowercase()
-            val imageUrls: List<String> = ImageSourceManager.getInstance()?.getImageUrlsNormal(req)
+            val imageUrls: List<String> = ImageSourceManager.getInstance()?.getImageUrlsNormal(req, true)
                     ?.filterNotNull()
                     ?: emptyList()
 
@@ -869,7 +869,7 @@ object Lolicon : CompositeCommand(
             req[ParamsConstant.NUM] = 2
             req[ParamsConstant.TAG] = "";
             req[ParamsConstant.SIZE] = PluginConfig.size.name.lowercase()
-            val imageUrls: List<String> = ImageSourceManager.getInstance()?.getImageUrlsSp(req)
+            val imageUrls: List<String> = ImageSourceManager.getInstance()?.getImageUrlsSp(req, true)
                     ?.filterNotNull()
                     ?: emptyList()
 

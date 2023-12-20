@@ -52,6 +52,7 @@ public class ImageSourceManager {
         register(new TangdouzSourceImpl());
         register(new StarChenTSourceImpl());
         register(new AcgMxSourceImpl());
+        register(new AcgMxSourceImplNew());
     }
 
 

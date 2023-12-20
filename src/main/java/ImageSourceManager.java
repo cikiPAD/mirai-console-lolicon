@@ -79,12 +79,13 @@ public class ImageSourceManager {
 
 
 
-    public List<String> getImageUrlsNormal(Map<String, Object> params) {
+    public List<String> getImageUrlsNormal(Map<String, Object> params, boolean needAddParm) {
         try {
-
-            if (!additionParamNormal.isEmpty()) {
-                for (String paramKey:additionParamNormal.keySet()) {
-                    params.put(paramKey, additionParamNormal.get(paramKey));
+            if (needAddParm) {
+                if (!additionParamNormal.isEmpty()) {
+                    for (String paramKey : additionParamNormal.keySet()) {
+                        params.put(paramKey, additionParamNormal.get(paramKey));
+                    }
                 }
             }
 
@@ -101,12 +102,14 @@ public class ImageSourceManager {
     }
 
 
-    public List<String> getImageUrlsSp(Map<String, Object> params) {
+    public List<String> getImageUrlsSp(Map<String, Object> params, boolean needAddParm) {
         try {
 
-            if (!additionParamSp.isEmpty()) {
-                for (String paramKey:additionParamSp.keySet()) {
-                    params.put(paramKey, additionParamSp.get(paramKey));
+            if (needAddParm) {
+                if (!additionParamSp.isEmpty()) {
+                    for (String paramKey : additionParamSp.keySet()) {
+                        params.put(paramKey, additionParamSp.get(paramKey));
+                    }
                 }
             }
 

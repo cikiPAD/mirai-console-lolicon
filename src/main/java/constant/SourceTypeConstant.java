@@ -11,4 +11,6 @@ public class SourceTypeConstant {
     public static final String STARCHENT = "starchent";
 
     public static final String ACGMX = "acgmx";
+
+    public static final String ACGMX_NEW = "acgmx_new";
 }

@@ -74,6 +74,13 @@ public class AcgMxSourceImpl implements ImageSourceInterface {
 
         int count = 0;
         for (Map<String, Object> one:data) {
+
+            String type = (String) one.get("type");
+
+            if ("manga".equalsIgnoreCase(type)) {
+                continue;
+            }
+
             List<Map<String, Object>> metaPages = (List<Map<String, Object>>) one.get("meta_pages");
             if (metaPages!=null && !metaPages.isEmpty()) {
                 for (Map<String, Object> onePage: metaPages) {

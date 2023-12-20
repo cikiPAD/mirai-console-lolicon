@@ -29,5 +29,7 @@ public class ParamsConstant {
 
     public static final String ACGMX_DEFAULT_MODE = "day";
 
+    public static final String ACGMX_NEW_DEFAULT_MODE = "day";
+
     public static final String ACGMX_DATE = "date";
 }

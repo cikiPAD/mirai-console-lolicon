@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * 多个文件来源的统一入口
@@ -50,6 +51,7 @@ public class ImageSourceManager {
         register(new VvhanSourceImpl());
         register(new TangdouzSourceImpl());
         register(new StarChenTSourceImpl());
+        register(new AcgMxSourceImpl());
     }
 
 
@@ -168,6 +170,11 @@ public class ImageSourceManager {
 
 
     public boolean setCurrentTypeNormal(String type) {
+
+        if (SourceTypeConstant.ACGMX.equalsIgnoreCase(type)) {
+            return false;
+        }
+
         if (sources.containsKey(type)) {
             currentTypeNormal = type;
             return true;
@@ -178,6 +185,11 @@ public class ImageSourceManager {
     }
 
     public boolean setCurrentTypeSp(String type) {
+
+        if (SourceTypeConstant.ACGMX.equalsIgnoreCase(type)) {
+            return false;
+        }
+
         if (sources.containsKey(type)) {
             currentTypeSp = type;
             return true;
@@ -188,7 +200,7 @@ public class ImageSourceManager {
     }
 
     public String getAllType() {
-        return String.join(",",sources.keySet());
+        return String.join(",",sources.keySet().stream().filter((p)->!SourceTypeConstant.ACGMX.equalsIgnoreCase(p)).collect(Collectors.toSet()));
     }
 
 

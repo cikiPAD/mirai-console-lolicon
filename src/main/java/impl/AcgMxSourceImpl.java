@@ -17,7 +17,6 @@ import java.util.*;
  */
 public class AcgMxSourceImpl implements ImageSourceInterface {
 
-
     private String url = "https://api.acgmx.com/illusts/ranking";
 
     private String token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjaWtpUEFEIiwidXVpZCI6Ijg2MzczZmJiMDY5YjQ5Zjg4ODViOTQwMzQ1NGViYmMyIiwiaWF0IjoxNjk4NTg3NTI1LCJhY2NvdW50Ijoie1wiZW1haWxcIjpcImJlc3R0c2NAZm94bWFpbC5jb21cIixcImdlbmRlclwiOi0xLFwiaGFzUHJvblwiOjAsXCJpZFwiOjI4NzAsXCJwYXNzV29yZFwiOlwiYzhhNDcyNTEwMzk0MjdlMTk2ZDk2M2NkMTM0ZTYyZDZcIixcInN0YXR1c1wiOjAsXCJ1c2VyTmFtZVwiOlwiY2lraVBBRFwifSIsImp0aSI6IjI4NzAifQ.3TOoFNxJE7Y2jBNuROHkCqc5v8cj8A1CGlNxyxk1eko";
@@ -83,10 +82,17 @@ public class AcgMxSourceImpl implements ImageSourceInterface {
 
             List<Map<String, Object>> metaPages = (List<Map<String, Object>>) one.get("meta_pages");
             if (metaPages!=null && !metaPages.isEmpty()) {
+
+                int meta_pages_count = 0;
+                
                 for (Map<String, Object> onePage: metaPages) {
                     String oneUrl = getUrlFromImageUrls((Map<String, Object>)(onePage.get("image_urls")), params);
                     if (oneUrl!=null & oneUrl.length()!=0) {
                         ret.add(oneUrl);
+                        meta_pages_count++;
+                    }
+                    if (meta_pages_count >= 3) {
+                        break;
                     }
                 }
             }

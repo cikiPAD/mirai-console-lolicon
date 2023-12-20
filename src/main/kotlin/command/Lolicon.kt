@@ -1062,7 +1062,7 @@ object Lolicon : CompositeCommand(
 
     @SubCommand("排行2", "rank2")
     @Description("查询pixiv榜单")
-    suspend fun CommandSenderOnMessage<MessageEvent>.rankQuery(json: String = "") {
+    suspend fun CommandSenderOnMessage<MessageEvent>.rankQuery2(json: String = "") {
         val mutex = getSubjectMutex(subject) ?: return
         if (mutex.isLocked) {
             logger.info("throttled")

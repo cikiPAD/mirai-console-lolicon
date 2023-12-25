@@ -80,6 +80,69 @@ public class ImageSourceManager {
     }
 
 
+    public List<ImageUrlEntity> getImageUrlsEntity(String type, Map<String, Object> params) {
+        try {
+            if (sources.containsKey(type)) {
+                return sources.get(type).getImageUrlEntity(filterNullValues(params));
+            } else {
+                return new ArrayList<>();
+            }
+        }
+        catch (Exception e){
+            return new ArrayList<>();
+        }
+    }
+
+
+
+    public List<ImageUrlEntity> getImageUrlsEntity(Map<String, Object> params, boolean isSp, boolean needAddParm) {
+        try {
+
+            if (isSp) {
+
+                if (needAddParm) {
+                    if (!additionParamSp.isEmpty()) {
+                        for (String paramKey : additionParamSp.keySet()) {
+                            params.put(paramKey, additionParamSp.get(paramKey));
+                        }
+                    }
+                }
+
+
+                if (sources.containsKey(currentTypeSp)) {
+                    return sources.get(currentTypeSp).getImageUrlEntity(filterNullValues(params));
+                } else {
+                    return new ArrayList<>();
+                }
+
+
+            }
+            else {
+
+                if (needAddParm) {
+                    if (!additionParamNormal.isEmpty()) {
+                        for (String paramKey : additionParamNormal.keySet()) {
+                            params.put(paramKey, additionParamNormal.get(paramKey));
+                        }
+                    }
+                }
+
+
+                if (sources.containsKey(currentTypeNormal)) {
+                    return sources.get(currentTypeNormal).getImageUrlEntity(filterNullValues(params));
+                } else {
+                    return new ArrayList<>();
+                }
+
+            }
+
+        }
+        catch (Exception e){
+            return new ArrayList<>();
+        }
+    }
+
+
 
 
     public List<String> getImageUrlsNormal(Map<String, Object> params, boolean needAddParm) {

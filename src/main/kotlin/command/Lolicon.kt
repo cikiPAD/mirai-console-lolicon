@@ -722,7 +722,7 @@ object Lolicon : CompositeCommand(
                         }
                         imageMsgBuilder.add(contact.bot, PlainText(entity.getDisplayString()))
                     
-                        for (imageUrl in entity.getUrls()) {
+                        for (imageUrl in entity.getUrls()?.filterNotNull()?: emptyList()) {
                             runCatching {
                                 logger.info(imageUrl)
                                 val oneDownloadTimeStart = System.currentTimeMillis()
@@ -1028,7 +1028,7 @@ object Lolicon : CompositeCommand(
                     }
                     imageMsgBuilder.add(contact.bot, PlainText(entity.getDisplayString()))
                     
-                    for (imageUrl in entity.getUrls()) {
+                    for (imageUrl in entity.getUrls()?.filterNotNull()?: emptyList()) {
                         runCatching {
                             logger.info(imageUrl)
                             val oneDownloadTimeStart = System.currentTimeMillis()
@@ -1138,7 +1138,7 @@ object Lolicon : CompositeCommand(
 
                     imageMsgBuilder.add(contact.bot, PlainText(entity.getDisplayString()))
                     
-                    for (imageUrl in entity.getUrls()) {
+                    for (imageUrl in entity.getUrls()?.filterNotNull()?: emptyList()) {
                         runCatching {
                             logger.info(imageUrl)
                             val oneDownloadTimeStart = System.currentTimeMillis()

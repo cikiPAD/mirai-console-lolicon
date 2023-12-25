@@ -844,9 +844,20 @@ object Lolicon : CompositeCommand(
                     ?: emptyList()
 
 
-            val images: MutableList<Any> = mutableListOf()
+            val entities: MutableList<Any> = mutableListOf()
+
+            
 
             for (entity in imageUrls) {
+
+                val updatedEntity = ImageUpdatedEntity()
+
+                val images: MutableList<Any> = mutableListOf()
+
+                updatedEntity.setUrls(entity)
+
+                updatedEntity.setImages(images)
+                
                 for (imageUrl in entity.getUrls()?.filterNotNull()?: emptyList()) {
                         runCatching {
                             logger.info(imageUrl)
@@ -881,9 +892,20 @@ object Lolicon : CompositeCommand(
                     ?: emptyList()
 
 
-            val images: MutableList<Any> = mutableListOf()
+           val entities: MutableList<Any> = mutableListOf()
+
             
+
             for (entity in imageUrls) {
+
+                val updatedEntity = ImageUpdatedEntity()
+
+                val images: MutableList<Any> = mutableListOf()
+
+                updatedEntity.setUrls(entity)
+
+                updatedEntity.setImages(images)
+                
                 for (imageUrl in entity.getUrls()?.filterNotNull()?: emptyList()) {
                         runCatching {
                             logger.info(imageUrl)

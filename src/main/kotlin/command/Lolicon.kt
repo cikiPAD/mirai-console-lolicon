@@ -16,6 +16,7 @@
  */
 package io.github.samarium150.mirai.plugin.lolicon.command
 
+import io.github.samarium150.mirai.plugin.lolicon.command.ImageUpdatedEntity
 import io.github.samarium150.mirai.plugin.lolicon.command.ImageUrlEntity
 import io.github.samarium150.mirai.plugin.lolicon.command.constant.*
 import io.github.samarium150.mirai.plugin.lolicon.command.ImageCachedPool
@@ -697,17 +698,10 @@ object Lolicon : CompositeCommand(
                     //imageMsgBuilder.add(contact.bot, PlainText(imageData.toReadable(imageData.urls)))
                     val getUrlStart = System.currentTimeMillis()
 
-                    var imageUrls: List<String> = emptyList()
-                    if (isSp) {
-                        imageUrls = ImageSourceManager.getInstance()?.getImageUrlsSp(req, false)
+                    var imageUrls: List<ImageUrlEntity> =  ImageSourceManager.getInstance()?.getImageUrlsEntity(req, isSp, false)
                         ?.filterNotNull()
                         ?: emptyList()
-                    }
-                    else {
-                        imageUrls = ImageSourceManager.getInstance()?.getImageUrlsNormal(req, false)
-                        ?.filterNotNull()
-                        ?: emptyList()
-                    }
+                    
                     
 
                     val getUrlTime = System.currentTimeMillis() - getUrlStart
@@ -721,26 +715,36 @@ object Lolicon : CompositeCommand(
                     val uploadStart = System.currentTimeMillis()
                     var onlyUploadTime: Long = 0
                     var onlyDownloadTime: Long = 0
-                    for (imageUrl in imageUrls) {
-                        runCatching {
-                            logger.info(imageUrl)
-                            val oneDownloadTimeStart = System.currentTimeMillis()
-                            val stream = getImageInputStream(imageUrl)
-                            onlyDownloadTime += (System.currentTimeMillis()-oneDownloadTimeStart)
-                            val oneUploadTimeStart = System.currentTimeMillis()
-                            val image = contact.uploadImage(stream)
-                            onlyUploadTime += (System.currentTimeMillis()-oneUploadTimeStart)
-                            imageMsgBuilder.add(contact.bot, image)
-                            stream
-                        }.onFailure {
-                            logger.error(it)
-                            imageMsgBuilder.add(contact.bot, PlainText(ReplyConfig.networkError))
-                        }.onSuccess {
-                            runInterruptible(Dispatchers.IO) {
-                                it.close()
+                    
+                    for (entity in imageUrls) {
+                        if (entity == null) {
+                            continue
+                        }
+                        imageMsgBuilder.add(contact.bot, PlainText(entity.getDisplayString()))
+                    
+                        for (imageUrl in entity.getUrls()) {
+                            runCatching {
+                                logger.info(imageUrl)
+                                val oneDownloadTimeStart = System.currentTimeMillis()
+                                val stream = getImageInputStream(imageUrl)
+                                onlyDownloadTime += (System.currentTimeMillis()-oneDownloadTimeStart)
+                                val oneUploadTimeStart = System.currentTimeMillis()
+                                val image = contact.uploadImage(stream)
+                                onlyUploadTime += (System.currentTimeMillis()-oneUploadTimeStart)
+                                imageMsgBuilder.add(contact.bot, image)
+                                stream
+                            }.onFailure {
+                                logger.error(it)
+                                imageMsgBuilder.add(contact.bot, PlainText(ReplyConfig.networkError))
+                            }.onSuccess {
+                                runInterruptible(Dispatchers.IO) {
+                                    it.close()
+                                }
                             }
                         }
                     }
+                
+                    
 
                     val uploadTime = System.currentTimeMillis() - uploadStart
                     val allTime = System.currentTimeMillis() - allTimeStart;

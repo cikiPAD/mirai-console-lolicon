@@ -16,6 +16,7 @@
  */
 package io.github.samarium150.mirai.plugin.lolicon.command
 
+import io.github.samarium150.mirai.plugin.lolicon.command.ImageUrlEntity
 import io.github.samarium150.mirai.plugin.lolicon.command.constant.*
 import io.github.samarium150.mirai.plugin.lolicon.command.ImageCachedPool
 import io.github.samarium150.mirai.plugin.lolicon.command.ImageSourceManager
@@ -1102,7 +1103,7 @@ object Lolicon : CompositeCommand(
                 //imageMsgBuilder.add(contact.bot, PlainText(imageData.toReadable(imageData.urls)))
                 val getUrlStart = System.currentTimeMillis()
 
-                val imageUrls: List<String> = ImageSourceManager.getInstance()?.getImageUrls(SourceTypeConstant.ACGMX,req)
+                val imageUrls: List<ImageUrlEntity> = ImageSourceManager.getInstance()?.getImageUrlsEntity(SourceTypeConstant.ACGMX,req)
                     ?.filterNotNull()
                     ?: emptyList()
                     
@@ -1119,23 +1120,28 @@ object Lolicon : CompositeCommand(
                 val uploadStart = System.currentTimeMillis()
                 var onlyUploadTime: Long = 0
                 var onlyDownloadTime: Long = 0
-                for (imageUrl in imageUrls) {
-                    runCatching {
-                        logger.info(imageUrl)
-                        val oneDownloadTimeStart = System.currentTimeMillis()
-                        val stream = getImageInputStream(imageUrl)
-                        onlyDownloadTime += (System.currentTimeMillis()-oneDownloadTimeStart)
-                        val oneUploadTimeStart = System.currentTimeMillis()
-                        val image = contact.uploadImage(stream)
-                        onlyUploadTime += (System.currentTimeMillis()-oneUploadTimeStart)
-                        imageMsgBuilder.add(contact.bot, image)
-                        stream
-                    }.onFailure {
-                        logger.error(it)
-                        imageMsgBuilder.add(contact.bot, PlainText(ReplyConfig.networkError))
-                    }.onSuccess {
-                        runInterruptible(Dispatchers.IO) {
-                            it.close()
+                for (entity in imageUrls) {
+
+                    imageMsgBuilder.add(contact.bot, PlainText(entity.getDisplayString()))
+                    
+                    for (imageUrl in entity.getUrls()) {
+                        runCatching {
+                            logger.info(imageUrl)
+                            val oneDownloadTimeStart = System.currentTimeMillis()
+                            val stream = getImageInputStream(imageUrl)
+                            onlyDownloadTime += (System.currentTimeMillis()-oneDownloadTimeStart)
+                            val oneUploadTimeStart = System.currentTimeMillis()
+                            val image = contact.uploadImage(stream)
+                            onlyUploadTime += (System.currentTimeMillis()-oneUploadTimeStart)
+                            imageMsgBuilder.add(contact.bot, image)
+                            stream
+                        }.onFailure {
+                            logger.error(it)
+                            imageMsgBuilder.add(contact.bot, PlainText(ReplyConfig.networkError))
+                        }.onSuccess {
+                            runInterruptible(Dispatchers.IO) {
+                                it.close()
+                            }
                         }
                     }
                 }

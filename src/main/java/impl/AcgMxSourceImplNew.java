@@ -233,7 +233,7 @@ public class AcgMxSourceImplNew implements ImageSourceInterface {
             }
 
             if (!entity.getUrls().isEmpty()) {
-                handleRespUrl(entity.getUrls(), params);
+                entity.setUrls(handleRespUrl(entity.getUrls(), params));
             }
 
 

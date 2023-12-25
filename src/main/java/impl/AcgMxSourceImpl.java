@@ -32,7 +32,7 @@ public class AcgMxSourceImpl implements ImageSourceInterface {
     public List<InputStream> getImageStream(Map<String, Object> params) {
         throw new UnsupportedOperationException("不支持此操作");
     }
-    
+
     @Override
     public List<String> getImageUrl(Map<String, Object> params) {
         Map<String, Object> oriParams = new HashMap<>();
@@ -232,7 +232,7 @@ public class AcgMxSourceImpl implements ImageSourceInterface {
             }
 
             if (!entity.getUrls().isEmpty()) {
-                handleRespUrl(entity.getUrls(), params);
+                entity.setUrls(handleRespUrl(entity.getUrls(), params));
             }
 
 

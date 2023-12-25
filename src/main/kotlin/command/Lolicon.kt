@@ -685,15 +685,15 @@ object Lolicon : CompositeCommand(
                         val msg: ImageUpdatedEntity? = image as? ImageUpdatedEntity
                         if (msg != null) {
 
-                            if (msg.getUrls != null) {
+                            if (msg.getUrls() != null) {
                                 imageMsgBuilder.add(contact.bot, PlainText(msg.getUrls().getDisplayString()+""))
                             }
                             
                             for (imageOne in msg.getImages()?.filterNotNull()?: emptyList()) {
 
-                                val imageSelf:Image =  imageOne as? Image
+                                val imageSelf: Image =  imageOne as? Image
                                 if (imageSelf!= null) {
-                                    imageMsgBuilder.add(contact.bot, msg)
+                                    imageMsgBuilder.add(contact.bot, imageSelf)
                                 }
                                 else {
                                     imageMsgBuilder.add(contact.bot, PlainText("类型转换失败,非图片类型"))

@@ -2,12 +2,14 @@ package io.github.samarium150.mirai.plugin.lolicon.command.impl;
 
 import com.google.gson.Gson;
 import io.github.samarium150.mirai.plugin.lolicon.command.ImageSourceInterface;
+import io.github.samarium150.mirai.plugin.lolicon.command.ImageUrlEntity;
 import io.github.samarium150.mirai.plugin.lolicon.command.LoliHttpClient;
 import io.github.samarium150.mirai.plugin.lolicon.command.constant.ParamsConstant;
 import io.github.samarium150.mirai.plugin.lolicon.command.constant.SourceTypeConstant;
 
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -84,7 +86,7 @@ public class AcgMxSourceImpl implements ImageSourceInterface {
             if (metaPages!=null && !metaPages.isEmpty()) {
 
                 int meta_pages_count = 0;
-                
+
                 for (Map<String, Object> onePage: metaPages) {
                     String oneUrl = getUrlFromImageUrls((Map<String, Object>)(onePage.get("image_urls")), params);
                     if (oneUrl!=null & oneUrl.length()!=0) {
@@ -110,6 +112,137 @@ public class AcgMxSourceImpl implements ImageSourceInterface {
             }
         }
         return handleRespUrl(ret, params);
+    }
+
+
+    @Override
+    public List<ImageUrlEntity> getImageUrlEntity(Map<String, Object> params) {
+        Map<String, Object> oriParams = new HashMap<>();
+        oriParams.putAll(params);
+        String url = handleReqUrl(params);
+
+        Map<String, String> headers = new HashMap<>();
+        headers.put("token", token);
+        String s = LoliHttpClient.get(url, headers);
+        if (s == null) {
+            return new ArrayList<>();
+        }
+        Gson gson = new Gson();
+
+
+        Map map = gson.fromJson(s, Map.class);
+        List<Map<String, Object>> data = (List<Map<String, Object>>) map.get("illusts");
+
+
+        if (data.isEmpty()) {
+            System.out.println("未生成这个时间的日榜，调整日期");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            String date = dateFormat.format(new Date(System.currentTimeMillis() - 2*24*60*60*1000L));
+            oriParams.put(ParamsConstant.ACGMX_DATE, date);
+            String urlChange = handleReqUrl(oriParams);
+            String twiceStr = LoliHttpClient.get(urlChange, headers);
+            if (twiceStr == null) {
+                return new ArrayList<>();
+            }
+            Map twiceMap = gson.fromJson(twiceStr, Map.class);
+            data = (List<Map<String, Object>>) twiceMap.get("illusts");
+        }
+
+        List<ImageUrlEntity> ret = new ArrayList<>();
+
+        int num = 5;
+
+        if (params.containsKey(ParamsConstant.NUM)) {
+            num = (int) params.get(ParamsConstant.NUM);
+        }
+
+        int count = 0;
+        for (Map<String, Object> one:data) {
+
+            String type = (String) one.get("type");
+
+            if ("manga".equalsIgnoreCase(type)) {
+                continue;
+            }
+
+            ImageUrlEntity entity = new ImageUrlEntity();
+            List<String> oneRet = new ArrayList<>();
+
+            entity.setUrls(oneRet);
+            entity.setSource(getType());
+
+            StringBuilder displayString = new StringBuilder();
+
+            try {
+
+                String title = one.get("title") + "";
+
+                String issultId =  new BigDecimal(one.get("id") + "").longValue() + "";
+
+                Map<String, Object> author = (Map<String, Object>) one.get("user");
+
+                String userId =  new BigDecimal(author.get("id") + "").longValue() + "";
+
+                String userName =  author.get("name") + "";
+
+                displayString.append("作品标题:").append(title).append("\r\n");
+
+                displayString.append("作品id:").append(issultId).append("\r\n");
+
+                displayString.append("作者id:").append(userId).append("\r\n");
+
+                displayString.append("作者名称:").append(userName).append("\r\n");
+
+                displayString.append("图片来源:").append(getType()).append("\r\n");
+
+                entity.setDisplayString(displayString.toString());
+
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+
+
+
+            List<Map<String, Object>> metaPages = (List<Map<String, Object>>) one.get("meta_pages");
+            if (metaPages!=null && !metaPages.isEmpty()) {
+
+                int meta_pages_count = 0;
+
+                for (Map<String, Object> onePage: metaPages) {
+                    String oneUrl = getUrlFromImageUrls((Map<String, Object>)(onePage.get("image_urls")), params);
+                    if (oneUrl!=null & oneUrl.length()!=0) {
+                        oneRet.add(oneUrl);
+                        meta_pages_count++;
+                    }
+                    if (meta_pages_count >= 3) {
+                        break;
+                    }
+                }
+            }
+            else {
+                Map<String, Object> imageUrls = (Map<String, Object>) one.get("image_urls");
+                String oneUrl = getUrlFromImageUrls(imageUrls, params);
+                if (oneUrl!=null & oneUrl.length()!=0) {
+                    oneRet.add(oneUrl);
+                }
+            }
+
+            if (!entity.getUrls().isEmpty()) {
+                ret.add(entity);
+            }
+
+            if (!entity.getUrls().isEmpty()) {
+                handleRespUrl(entity.getUrls(), params);
+            }
+
+
+            count++;
+            if (count>=num) {
+                break;
+            }
+        }
+        return ret;
     }
 
 

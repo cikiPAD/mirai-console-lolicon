@@ -1001,7 +1001,7 @@ object Lolicon : CompositeCommand(
                 //imageMsgBuilder.add(contact.bot, PlainText(imageData.toReadable(imageData.urls)))
                 val getUrlStart = System.currentTimeMillis()
 
-                val imageUrls: List<String> = ImageSourceManager.getInstance()?.getImageUrls(SourceTypeConstant.ACGMX_NEW,req)
+                val imageUrls: List<ImageUrlEntity> = ImageSourceManager.getInstance()?.getImageUrlsEntity(SourceTypeConstant.ACGMX_NEW,req)
                     ?.filterNotNull()
                     ?: emptyList()
                     
@@ -1018,23 +1018,30 @@ object Lolicon : CompositeCommand(
                 val uploadStart = System.currentTimeMillis()
                 var onlyUploadTime: Long = 0
                 var onlyDownloadTime: Long = 0
-                for (imageUrl in imageUrls) {
-                    runCatching {
-                        logger.info(imageUrl)
-                        val oneDownloadTimeStart = System.currentTimeMillis()
-                        val stream = getImageInputStream(imageUrl)
-                        onlyDownloadTime += (System.currentTimeMillis()-oneDownloadTimeStart)
-                        val oneUploadTimeStart = System.currentTimeMillis()
-                        val image = contact.uploadImage(stream)
-                        onlyUploadTime += (System.currentTimeMillis()-oneUploadTimeStart)
-                        imageMsgBuilder.add(contact.bot, image)
-                        stream
-                    }.onFailure {
-                        logger.error(it)
-                        imageMsgBuilder.add(contact.bot, PlainText(ReplyConfig.networkError))
-                    }.onSuccess {
-                        runInterruptible(Dispatchers.IO) {
-                            it.close()
+                for (entity in imageUrls) {
+                    if (entity == null) {
+                        continue
+                    }
+                    imageMsgBuilder.add(contact.bot, PlainText(entity.getDisplayString()))
+                    
+                    for (imageUrl in entity.getUrls()) {
+                        runCatching {
+                            logger.info(imageUrl)
+                            val oneDownloadTimeStart = System.currentTimeMillis()
+                            val stream = getImageInputStream(imageUrl)
+                            onlyDownloadTime += (System.currentTimeMillis()-oneDownloadTimeStart)
+                            val oneUploadTimeStart = System.currentTimeMillis()
+                            val image = contact.uploadImage(stream)
+                            onlyUploadTime += (System.currentTimeMillis()-oneUploadTimeStart)
+                            imageMsgBuilder.add(contact.bot, image)
+                            stream
+                        }.onFailure {
+                            logger.error(it)
+                            imageMsgBuilder.add(contact.bot, PlainText(ReplyConfig.networkError))
+                        }.onSuccess {
+                            runInterruptible(Dispatchers.IO) {
+                                it.close()
+                            }
                         }
                     }
                 }
@@ -1121,6 +1128,9 @@ object Lolicon : CompositeCommand(
                 var onlyUploadTime: Long = 0
                 var onlyDownloadTime: Long = 0
                 for (entity in imageUrls) {
+                    if (entity == null) {
+                        continue
+                    }
 
                     imageMsgBuilder.add(contact.bot, PlainText(entity.getDisplayString()))
                     

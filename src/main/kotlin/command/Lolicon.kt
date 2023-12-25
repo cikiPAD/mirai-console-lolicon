@@ -691,7 +691,7 @@ object Lolicon : CompositeCommand(
                             
                             for (imageOne in msg.getImages()?.filterNotNull()?: emptyList()) {
 
-                                val imageSelf: Image =  imageOne as? Image
+                                val imageSelf: Image? =  imageOne as? Image
                                 if (imageSelf!= null) {
                                     imageMsgBuilder.add(contact.bot, imageSelf)
                                 }

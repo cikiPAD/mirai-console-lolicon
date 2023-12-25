@@ -839,29 +839,31 @@ object Lolicon : CompositeCommand(
             req[ParamsConstant.NUM] = 2
             req[ParamsConstant.TAG] = "";
             req[ParamsConstant.SIZE] = PluginConfig.size.name.lowercase()
-            val imageUrls: List<String> = ImageSourceManager.getInstance()?.getImageUrlsNormal(req, true)
+            val imageUrls: List<ImageUrlEntity> = ImageSourceManager.getInstance()?.getImageUrlsEntity(req, false, true)
                     ?.filterNotNull()
                     ?: emptyList()
 
 
             val images: MutableList<Any> = mutableListOf()
-            
-            for (imageUrl in imageUrls) {
-                    runCatching {
-                        logger.info(imageUrl)
-                        val stream = getImageInputStream(imageUrl)
-                        val image = contact.uploadImage(stream)
-                        images.add(image)
-                        stream
-                    }.onFailure {
-                        logger.error(it)
-                    }.onSuccess {
+
+            for (entity in imageUrls) {
+                for (imageUrl in entity.getUrls()?.filterNotNull()?: emptyList()) {
+                        runCatching {
+                            logger.info(imageUrl)
+                            val stream = getImageInputStream(imageUrl)
+                            val image = contact.uploadImage(stream)
+                            images.add(image)
+                            stream
+                        }.onFailure {
+                            logger.error(it)
+                        }.onSuccess {
                        
-                        runInterruptible(Dispatchers.IO) {
-                            it.close()
-                        }
+                            runInterruptible(Dispatchers.IO) {
+                                it.close()
+                            }
                         
-                    }
+                        }
+                }
             }
 
             ImageCachedPool.getInstance().putImageNormal(images);
@@ -874,29 +876,31 @@ object Lolicon : CompositeCommand(
             req[ParamsConstant.NUM] = 2
             req[ParamsConstant.TAG] = "";
             req[ParamsConstant.SIZE] = PluginConfig.size.name.lowercase()
-            val imageUrls: List<String> = ImageSourceManager.getInstance()?.getImageUrlsSp(req, true)
+            val imageUrls: List<ImageUrlEntity> = ImageSourceManager.getInstance()?.getImageUrlsEntity(req, true, true)
                     ?.filterNotNull()
                     ?: emptyList()
 
 
             val images: MutableList<Any> = mutableListOf()
             
-            for (imageUrl in imageUrls) {
-                    runCatching {
-                        logger.info(imageUrl)
-                        val stream = getImageInputStream(imageUrl)
-                        val image = contact.uploadImage(stream)
-                        images.add(image)
-                        stream
-                    }.onFailure {
-                        logger.error(it)
-                    }.onSuccess {
+            for (entity in imageUrls) {
+                for (imageUrl in entity.getUrls()?.filterNotNull()?: emptyList()) {
+                        runCatching {
+                            logger.info(imageUrl)
+                            val stream = getImageInputStream(imageUrl)
+                            val image = contact.uploadImage(stream)
+                            images.add(image)
+                            stream
+                        }.onFailure {
+                            logger.error(it)
+                        }.onSuccess {
                        
-                        runInterruptible(Dispatchers.IO) {
-                            it.close()
-                        }
+                            runInterruptible(Dispatchers.IO) {
+                                it.close()
+                            }
                         
-                    }
+                        }
+                }
             }
 
             ImageCachedPool.getInstance().putImageSp(images);

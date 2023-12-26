@@ -891,6 +891,8 @@ object Lolicon : CompositeCommand(
                         
                         }
                 }
+
+                entities.add(updatedEntity)
             }
 
             ImageCachedPool.getInstance().putImageNormal(entities);
@@ -939,6 +941,8 @@ object Lolicon : CompositeCommand(
                         
                         }
                 }
+
+                entities.add(updatedEntity)
             }
 
             ImageCachedPool.getInstance().putImageSp(entities);

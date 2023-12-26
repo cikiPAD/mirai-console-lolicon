@@ -1,6 +1,5 @@
 package io.github.samarium150.mirai.plugin.lolicon.command.impl;
 
-import com.google.gson.Gson;
 import io.github.samarium150.mirai.plugin.lolicon.command.constant.ParamsConstant;
 import io.github.samarium150.mirai.plugin.lolicon.command.constant.SourceTypeConstant;
 
@@ -28,6 +27,11 @@ public class TangdouzSourceImpl extends SimpleSourceImpl {
             }
         }
 
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         return ret;
     }

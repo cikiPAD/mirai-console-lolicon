@@ -129,7 +129,7 @@ public class LoliconSourceImpl implements ImageSourceInterface {
         if (params.containsKey(ParamsConstant.TAG)) {
             List<String> tagList = handleTags((String) params.get(ParamsConstant.TAG));
             if (tagList == null || tagList.isEmpty()) {
-                params.remove(tagList);
+                params.remove(ParamsConstant.TAG);
             }
             else {
                 params.put(ParamsConstant.TAG, tagList);

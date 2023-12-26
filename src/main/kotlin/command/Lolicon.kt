@@ -708,6 +708,7 @@ object Lolicon : CompositeCommand(
                     
                 }
                 else {
+                    logger.info("缓存穿透")
                     val allTimeStart = System.currentTimeMillis()
                 
                     //imageMsgBuilder.add(contact.bot, PlainText(imageData.toReadable(imageData.urls)))

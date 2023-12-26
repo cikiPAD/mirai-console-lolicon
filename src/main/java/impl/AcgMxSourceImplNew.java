@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 仅用于处理排行榜,不注册
@@ -185,6 +186,13 @@ public class AcgMxSourceImplNew implements ImageSourceInterface {
 
                 String userName =  author.get("name") + "";
 
+                List<Map<String, Object>> tagsMap = (List<Map<String, Object>>) one.get("tags");
+
+                tagsMap.stream().map(p->p.get("name") + "").collect(Collectors.toSet());
+
+                String tags = String.join(",",tagsMap.stream().map(p->p.get("name") + "").collect(Collectors.toSet()));
+
+
                 displayString.append("作品标题:").append(title).append("\r\n");
 
                 displayString.append("作品id:").append(issultId).append("\r\n");
@@ -194,6 +202,9 @@ public class AcgMxSourceImplNew implements ImageSourceInterface {
                 displayString.append("作者名称:").append(userName).append("\r\n");
 
                 displayString.append("图片来源:").append(getType()).append("\r\n");
+
+                displayString.append("tags:").append(tags).append("\r\n");
+
 
                 entity.setDisplayString(displayString.toString());
 

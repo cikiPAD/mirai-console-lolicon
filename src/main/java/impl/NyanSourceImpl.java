@@ -2,12 +2,14 @@ package io.github.samarium150.mirai.plugin.lolicon.command.impl;
 
 import com.google.gson.Gson;
 import io.github.samarium150.mirai.plugin.lolicon.command.ImageSourceInterface;
+import io.github.samarium150.mirai.plugin.lolicon.command.ImageUrlEntity;
 import io.github.samarium150.mirai.plugin.lolicon.command.LoliHttpClient;
 import io.github.samarium150.mirai.plugin.lolicon.command.constant.ParamsConstant;
 import io.github.samarium150.mirai.plugin.lolicon.command.constant.SourceTypeConstant;
 
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -47,6 +49,72 @@ public class NyanSourceImpl implements ImageSourceInterface {
             ret.add(imageUrl);
         }
         return handleRespUrl(ret, params);
+    }
+
+
+    @Override
+    public List<ImageUrlEntity> getImageUrlEntity(Map<String, Object> params) {
+        String url = handleReqUrl(params);
+        String s = LoliHttpClient.get(url, null, null);
+        if (s == null) {
+            return new ArrayList<>();
+        }
+        Gson gson = new Gson();
+        Map map = gson.fromJson(s, Map.class);
+        List<Map<String, Object>> data = (List<Map<String, Object>>) map.get("data");
+
+        List<ImageUrlEntity> ret = new ArrayList<>();
+        for (Map<String, Object> one:data) {
+
+            ImageUrlEntity entity = new ImageUrlEntity();
+            List<String> oneRet = new ArrayList<>();
+
+            entity.setUrls(oneRet);
+            entity.setSource(getType());
+
+
+            String imageUrl = (String) one.get("url");
+            oneRet.add(imageUrl);
+            entity.setUrls(handleRespUrl(oneRet, params));
+
+            try {
+                StringBuilder displayString = new StringBuilder();
+
+                String title = one.get("title") + "";
+
+                String issultId =  new BigDecimal(one.get("pid") + "").longValue() + "";
+
+
+                String userId =  new BigDecimal(one.get("author_uid") + "").longValue() + "";
+
+                String userName =  one.get("author") + "";
+
+                String tags = String.join(",",(List<String>) one.get("tags"));
+
+                displayString.append("作品标题:").append(title).append("\r\n");
+
+                displayString.append("作品id:").append(issultId).append("\r\n");
+
+                displayString.append("作者id:").append(userId).append("\r\n");
+
+                displayString.append("作者名称:").append(userName).append("\r\n");
+
+                displayString.append("图片来源:").append(getType()).append("\r\n");
+
+                displayString.append("tags:").append(tags).append("\r\n");
+
+                entity.setDisplayString(displayString.toString());
+
+
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            ret.add(entity);
+
+        }
+        return ret;
     }
 
     @Override

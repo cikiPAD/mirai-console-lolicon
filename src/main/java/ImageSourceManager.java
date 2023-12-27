@@ -53,6 +53,7 @@ public class ImageSourceManager {
         register(new StarChenTSourceImpl());
         register(new AcgMxSourceImpl());
         register(new AcgMxSourceImplNew());
+        register(new PidUidSearchImpl());
     }
 
 
@@ -235,11 +236,8 @@ public class ImageSourceManager {
 
     public boolean setCurrentTypeNormal(String type) {
 
-        if (SourceTypeConstant.ACGMX.equalsIgnoreCase(type)) {
-            return false;
-        }
 
-        if (sources.containsKey(type)) {
+        if (sources.containsKey(type)&& sources.get(type).visible()) {
             currentTypeNormal = type;
             return true;
         }
@@ -250,11 +248,8 @@ public class ImageSourceManager {
 
     public boolean setCurrentTypeSp(String type) {
 
-        if (SourceTypeConstant.ACGMX.equalsIgnoreCase(type)) {
-            return false;
-        }
 
-        if (sources.containsKey(type)) {
+        if (sources.containsKey(type) && sources.get(type).visible()) {
             currentTypeSp = type;
             return true;
         }
@@ -264,7 +259,7 @@ public class ImageSourceManager {
     }
 
     public String getAllType() {
-        return String.join(",",sources.keySet().stream().filter((p)->!SourceTypeConstant.ACGMX.equalsIgnoreCase(p)).collect(Collectors.toSet()));
+        return String.join(",",sources.keySet().stream().filter((p)->sources.get(p).visible()).collect(Collectors.toSet()));
     }
 
 

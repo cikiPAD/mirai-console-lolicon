@@ -13,4 +13,6 @@ public class SourceTypeConstant {
     public static final String ACGMX = "acgmx";
 
     public static final String ACGMX_NEW = "acgmx_new";
+
+    public static final String PIC_SEARCH = "picSearch";
 }

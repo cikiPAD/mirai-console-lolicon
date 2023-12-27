@@ -32,4 +32,10 @@ public class ParamsConstant {
     public static final String ACGMX_NEW_DEFAULT_MODE = "day";
 
     public static final String ACGMX_DATE = "date";
+
+    public static final String SEARCH_TYPE_KEY = "search_type";
+
+    public static final String SEARCH_TYPE_PID = "search_type_pid";
+
+    public static final String SEARCH_TYPE_UID = "search_type_uid";
 }

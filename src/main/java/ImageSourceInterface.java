@@ -31,4 +31,8 @@ public interface ImageSourceInterface {
     }
 
     Map<String, Object> standardParams(Map<String, Object> params);
+
+    default boolean visible() {
+        return true;
+    }
 }

@@ -16,19 +16,21 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * 仅用于处理排行榜,不注册
+ * 仅用于处理搜图,不注册
  */
-public class AcgMxSourceImpl implements ImageSourceInterface {
+public class PidUidSearchImpl implements ImageSourceInterface {
 
-    private String url = "https://api.acgmx.com/illusts/ranking";
+    //https://api.acgmx.com/public/ranking?ranking_type=illust&mode=daily&date=2023-12-19&per_page=20&page=1
+    private String pid_url = "https://api.acgmx.com/illusts/detail";
+
+    private String uid_url = "https://api.acgmx.com/public/search/users/illusts";
 
     private String token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjaWtpUEFEIiwidXVpZCI6Ijg2MzczZmJiMDY5YjQ5Zjg4ODViOTQwMzQ1NGViYmMyIiwiaWF0IjoxNjk4NTg3NTI1LCJhY2NvdW50Ijoie1wiZW1haWxcIjpcImJlc3R0c2NAZm94bWFpbC5jb21cIixcImdlbmRlclwiOi0xLFwiaGFzUHJvblwiOjAsXCJpZFwiOjI4NzAsXCJwYXNzV29yZFwiOlwiYzhhNDcyNTEwMzk0MjdlMTk2ZDk2M2NkMTM0ZTYyZDZcIixcInN0YXR1c1wiOjAsXCJ1c2VyTmFtZVwiOlwiY2lraVBBRFwifSIsImp0aSI6IjI4NzAifQ.3TOoFNxJE7Y2jBNuROHkCqc5v8cj8A1CGlNxyxk1eko";
 
     @Override
     public String getType() {
-        return SourceTypeConstant.ACGMX;
+        return SourceTypeConstant.PIC_SEARCH;
     }
-
 
     @Override
     public boolean visible() {
@@ -40,86 +42,11 @@ public class AcgMxSourceImpl implements ImageSourceInterface {
         throw new UnsupportedOperationException("不支持此操作");
     }
 
+
     @Override
     public List<String> getImageUrl(Map<String, Object> params) {
-        Map<String, Object> oriParams = new HashMap<>();
-        oriParams.putAll(params);
-        String url = handleReqUrl(params);
-
-        Map<String, String> headers = new HashMap<>();
-        headers.put("token", token);
-        String s = LoliHttpClient.get(url, headers);
-        if (s == null) {
-            return new ArrayList<>();
-        }
-        Gson gson = new Gson();
-        Map map = gson.fromJson(s, Map.class);
-        List<Map<String, Object>> data = (List<Map<String, Object>>) map.get("illusts");
-
-
-        if (data.isEmpty()) {
-            System.out.println("未生成这个时间的日榜，调整日期");
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            String date = dateFormat.format(new Date(System.currentTimeMillis() - 2*24*60*60*1000L));
-            oriParams.put(ParamsConstant.ACGMX_DATE, date);
-            String urlChange = handleReqUrl(oriParams);
-            String twiceStr = LoliHttpClient.get(urlChange, headers);
-            if (twiceStr == null) {
-                return new ArrayList<>();
-            }
-            Map twiceMap = gson.fromJson(twiceStr, Map.class);
-            data = (List<Map<String, Object>>) twiceMap.get("illusts");
-        }
-
-        List<String> ret = new ArrayList<>();
-
-        int num = 5;
-
-        if (params.containsKey(ParamsConstant.NUM)) {
-            num = (int) params.get(ParamsConstant.NUM);
-        }
-
-        int count = 0;
-        for (Map<String, Object> one:data) {
-
-            String type = (String) one.get("type");
-
-            if ("manga".equalsIgnoreCase(type)) {
-                continue;
-            }
-
-            List<Map<String, Object>> metaPages = (List<Map<String, Object>>) one.get("meta_pages");
-            if (metaPages!=null && !metaPages.isEmpty()) {
-
-                int meta_pages_count = 0;
-
-                for (Map<String, Object> onePage: metaPages) {
-                    String oneUrl = getUrlFromImageUrls((Map<String, Object>)(onePage.get("image_urls")), params);
-                    if (oneUrl!=null & oneUrl.length()!=0) {
-                        ret.add(oneUrl);
-                        meta_pages_count++;
-                    }
-                    if (meta_pages_count >= 3) {
-                        break;
-                    }
-                }
-            }
-            else {
-                Map<String, Object> imageUrls = (Map<String, Object>) one.get("image_urls");
-                String oneUrl = getUrlFromImageUrls(imageUrls, params);
-                if (oneUrl!=null & oneUrl.length()!=0) {
-                    ret.add(oneUrl);
-                }
-            }
-
-            count++;
-            if (count>=num) {
-                break;
-            }
-        }
-        return handleRespUrl(ret, params);
+        throw new UnsupportedOperationException("不支持此操作");
     }
-
 
     @Override
     public List<ImageUrlEntity> getImageUrlEntity(Map<String, Object> params) {
@@ -137,22 +64,24 @@ public class AcgMxSourceImpl implements ImageSourceInterface {
 
 
         Map map = gson.fromJson(s, Map.class);
-        List<Map<String, Object>> data = (List<Map<String, Object>>) map.get("illusts");
 
 
-        if (data.isEmpty()) {
-            System.out.println("未生成这个时间的日榜，调整日期");
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            String date = dateFormat.format(new Date(System.currentTimeMillis() - 2*24*60*60*1000L));
-            oriParams.put(ParamsConstant.ACGMX_DATE, date);
-            String urlChange = handleReqUrl(oriParams);
-            String twiceStr = LoliHttpClient.get(urlChange, headers);
-            if (twiceStr == null) {
-                return new ArrayList<>();
+        List<Map<String, Object>> data = new ArrayList<>();
+
+        boolean isPidSearch = false;
+        if (params.containsKey(ParamsConstant.SEARCH_TYPE_KEY)) {
+            if (ParamsConstant.SEARCH_TYPE_PID.equalsIgnoreCase((String) params.get(ParamsConstant.SEARCH_TYPE_KEY))) {
+                isPidSearch = true;
+                data.add((Map<String, Object>) map.get("data"));
             }
-            Map twiceMap = gson.fromJson(twiceStr, Map.class);
-            data = (List<Map<String, Object>>) twiceMap.get("illusts");
+            else {
+                data = (List<Map<String, Object>>) map.get("illusts");
+            }
         }
+
+
+
+
 
         List<ImageUrlEntity> ret = new ArrayList<>();
 
@@ -183,7 +112,16 @@ public class AcgMxSourceImpl implements ImageSourceInterface {
 
                 String title = one.get("title") + "";
 
-                String issultId =  new BigDecimal(one.get("id") + "").longValue() + "";
+
+                String issultId = "";
+                if (isPidSearch) {
+                    issultId =  new BigDecimal(one.get("illust") + "").longValue() + "";
+
+                }else {
+                    issultId =  new BigDecimal(one.get("id") + "").longValue() + "";
+                }
+
+
 
                 Map<String, Object> author = (Map<String, Object>) one.get("user");
 
@@ -195,7 +133,14 @@ public class AcgMxSourceImpl implements ImageSourceInterface {
 
                 tagsMap.stream().map(p->p.get("name") + "").collect(Collectors.toSet());
 
-                String tags = String.join(",",tagsMap.stream().map(p->p.get("name") + "").collect(Collectors.toSet()));
+                Set<String> tagSet = tagsMap.stream().map(p->p.get("name") + "").collect(Collectors.toSet());
+
+                //过滤r18
+                if ( (tagSet.contains("R-18") || tagSet.contains("r-18")) && (int) params.get(ParamsConstant.R18) != 1) {
+                    continue;
+                }
+
+                String tags = String.join(",",tagSet);
 
 
                 displayString.append("作品标题:").append(title).append("\r\n");
@@ -238,7 +183,13 @@ public class AcgMxSourceImpl implements ImageSourceInterface {
             }
             else {
                 Map<String, Object> imageUrls = (Map<String, Object>) one.get("image_urls");
-                String oneUrl = getUrlFromImageUrls(imageUrls, params);
+                String oneUrl = null;
+                if (imageUrls!= null) {
+                    oneUrl = getUrlFromImageUrls(imageUrls, params);
+                }
+                else {
+                    oneUrl = (String) one.get("large");
+                }
                 if (oneUrl!=null & oneUrl.length()!=0) {
                     oneRet.add(oneUrl);
                 }
@@ -294,34 +245,28 @@ public class AcgMxSourceImpl implements ImageSourceInterface {
     @Override
     public Map<String, Object> standardParams(Map<String, Object> params) {
 
-
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        String date = dateFormat.format(new Date(System.currentTimeMillis() - 24*60*60*1000L));
-
-        if (!params.containsKey(ParamsConstant.ACGMX_DATE)) {
-            params.put(ParamsConstant.ACGMX_DATE, date);
-        }
+        params.put("offset", 30);
 
 
+
+        String q = "";
         if (params.containsKey(ParamsConstant.TAG)) {
-            if (params.get(ParamsConstant.TAG) != null && ((String)params.get(ParamsConstant.TAG)).trim().length()>0 ) {
-                params.put(ParamsConstant.ACGMX_MODE, params.get(ParamsConstant.TAG));
-            }
-            else {
-                params.put(ParamsConstant.ACGMX_MODE, ParamsConstant.ACGMX_DEFAULT_MODE);
+            if (params.get(ParamsConstant.TAG) != null && ((String) params.get(ParamsConstant.TAG)).trim().length() > 0) {
+                q = (String) params.get(ParamsConstant.TAG);
             }
             params.remove(ParamsConstant.TAG);
         }
-        else {
-            params.put(ParamsConstant.ACGMX_MODE, ParamsConstant.ACGMX_DEFAULT_MODE);
-        }
 
-        String mode = (String) params.get(ParamsConstant.ACGMX_MODE);
 
-        if (params.containsKey(ParamsConstant.R18)) {
-            int r18 = (int) params.get(ParamsConstant.R18);
-            if (r18 == 0 && mode.toLowerCase().contains("r18")) {
-                params.put(ParamsConstant.ACGMX_MODE, ParamsConstant.ACGMX_DEFAULT_MODE);
+        if (params.containsKey(ParamsConstant.SEARCH_TYPE_KEY)) {
+            if (ParamsConstant.SEARCH_TYPE_PID.equalsIgnoreCase((String) params.get(ParamsConstant.SEARCH_TYPE_KEY))) {
+
+                params.put("illustId", q);
+            }
+            else if (ParamsConstant.SEARCH_TYPE_UID.equalsIgnoreCase((String) params.get(ParamsConstant.SEARCH_TYPE_KEY))) {
+
+                params.put("id", q);
+
             }
         }
 
@@ -358,6 +303,20 @@ public class AcgMxSourceImpl implements ImageSourceInterface {
 
     public String handleReqUrl(Map<String, Object> params) {
         StringBuilder sb = new StringBuilder();
+
+        String url = uid_url;
+
+        if (params.containsKey(ParamsConstant.SEARCH_TYPE_KEY)) {
+            if (ParamsConstant.SEARCH_TYPE_PID.equalsIgnoreCase((String) params.get(ParamsConstant.SEARCH_TYPE_KEY))) {
+
+                url = pid_url;
+            }
+            else if (ParamsConstant.SEARCH_TYPE_UID.equalsIgnoreCase((String) params.get(ParamsConstant.SEARCH_TYPE_KEY))) {
+
+                url = uid_url;
+
+            }
+        }
         sb.append(url).append("?").append(generateUrlParams(standardParams(params)));
         return sb.toString();
     }

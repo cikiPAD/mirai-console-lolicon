@@ -31,6 +31,11 @@ public class AcgMxSourceImplNew implements ImageSourceInterface {
     }
 
     @Override
+    public boolean visible() {
+        return false;
+    }
+
+    @Override
     public List<InputStream> getImageStream(Map<String, Object> params) {
         throw new UnsupportedOperationException("不支持此操作");
     }

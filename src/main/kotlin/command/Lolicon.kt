@@ -1434,7 +1434,7 @@ object Lolicon : CompositeCommand(
 
     @SubCommand("搜图")
     @Description("根据图片搜图")
-    suspend fun CommandSenderOnMessage<MessageEvent>.uidQuery(json: String = "") {
+    suspend fun CommandSenderOnMessage<MessageEvent>.pspQuery(json: String = "") {
         val mutex = getSubjectMutex(subject) ?: return
         if (mutex.isLocked) {
             logger.info("throttled")

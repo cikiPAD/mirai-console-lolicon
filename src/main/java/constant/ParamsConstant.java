@@ -38,4 +38,10 @@ public class ParamsConstant {
     public static final String SEARCH_TYPE_PID = "search_type_pid";
 
     public static final String SEARCH_TYPE_UID = "search_type_uid";
+
+    public static final String ORI_MSG = "ori_msg";
+
+    public static final String PSP_NEED_RELATION = "psp_need_relation";
+
+    public static final String PSP_NEED_MORE = "psp_need_more";
 }

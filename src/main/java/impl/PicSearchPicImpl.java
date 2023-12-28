@@ -9,7 +9,9 @@ import io.github.samarium150.mirai.plugin.lolicon.command.constant.ParamsConstan
 import io.github.samarium150.mirai.plugin.lolicon.command.constant.SourceTypeConstant;
 
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
+import java.net.URLEncoder;
 import java.util.*;
 
 
@@ -319,11 +321,15 @@ public class PicSearchPicImpl implements ImageSourceInterface {
     }
 
     private static String encodeUrlParam(String key, Object value) {
-
-        //String encodedKey = URLEncoder.encode(key, "UTF-8");
-        //String encodedValue = URLEncoder.encode(value.toString(), "UTF-8");
-        return key + "=" + value;
-
+        try {
+            String encodedKey = URLEncoder.encode(key, "UTF-8");
+            String encodedValue = URLEncoder.encode(value.toString(), "UTF-8");
+            return encodedKey + "=" + encodedValue;
+        } catch (UnsupportedEncodingException e) {
+            // Handle encoding exception as per your requirement
+            e.printStackTrace();
+            return "";
+        }
     }
 
 

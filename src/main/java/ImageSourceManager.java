@@ -54,6 +54,7 @@ public class ImageSourceManager {
         register(new AcgMxSourceImpl());
         register(new AcgMxSourceImplNew());
         register(new PidUidSearchImpl());
+        register(new PicSearchPicImpl());
     }
 
 
@@ -90,6 +91,7 @@ public class ImageSourceManager {
             }
         }
         catch (Exception e){
+            e.printStackTrace();
             return new ArrayList<>();
         }
     }

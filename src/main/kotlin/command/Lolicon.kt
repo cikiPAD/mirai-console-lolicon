@@ -1431,6 +1431,111 @@ object Lolicon : CompositeCommand(
     }
 
 
+
+    @SubCommand("搜图")
+    @Description("根据图片搜图")
+    suspend fun CommandSenderOnMessage<MessageEvent>.uidQuery(json: String = "") {
+        val mutex = getSubjectMutex(subject) ?: return
+        if (mutex.isLocked) {
+            logger.info("throttled")
+            return
+        }
+        mutex.withLock {
+            val (r18, recall, cooldown) = ExecutionConfig(subject)
+            val req: MutableMap<String, Any?> = HashMap()
+            req[ParamsConstant.R18] = r18
+
+           
+            req[ParamsConstant.NUM] = 3
+            req[ParamsConstant.TAG] = json
+            req.put(ParamsConstant.ORI_MSG, fromEvent.message.toString());
+            req.put(ParamsConstant.PSP_NEED_MORE, "1");
+            req.put(ParamsConstant.PSP_NEED_RELATION, "1");
+            
+            req[ParamsConstant.SIZE] = PluginConfig.size.name.lowercase()
+            val notificationReceipt = getNotificationReceipt()
+
+            
+            if (subject != null && PluginConfig.messageType == PluginConfig.Type.Forward) {
+                val contact = subject as Contact
+                val imageMsgBuilder = ForwardMessageBuilder(contact)
+                imageMsgBuilder.displayStrategy = CustomDisplayStrategy
+                
+                
+               
+
+                val allTimeStart = System.currentTimeMillis()
+                
+                //imageMsgBuilder.add(contact.bot, PlainText(imageData.toReadable(imageData.urls)))
+                val getUrlStart = System.currentTimeMillis()
+
+                val imageUrls: List<ImageUrlEntity> = ImageSourceManager.getInstance()?.getImageUrlsEntity(SourceTypeConstant.PSP_SEARCH,req)
+                    ?.filterNotNull()
+                    ?: emptyList()
+                    
+                    
+
+                val getUrlTime = System.currentTimeMillis() - getUrlStart
+
+                if (imageUrls.isEmpty()) {
+                    sendMessage(ReplyConfig.emptyImageData)
+                    return@withLock
+                }
+
+
+                val uploadStart = System.currentTimeMillis()
+                var onlyUploadTime: Long = 0
+                var onlyDownloadTime: Long = 0
+                for (entity in imageUrls) {
+                    if (entity == null) {
+                        continue
+                    }
+
+                    imageMsgBuilder.add(contact.bot, PlainText(entity.getDisplayString()))
+                    
+                    for (imageUrl in entity.getUrls()?.filterNotNull()?: emptyList()) {
+                        runCatching {
+                            logger.info(imageUrl)
+                            val oneDownloadTimeStart = System.currentTimeMillis()
+                            val stream = getImageInputStream(imageUrl)
+                            onlyDownloadTime += (System.currentTimeMillis()-oneDownloadTimeStart)
+                            val oneUploadTimeStart = System.currentTimeMillis()
+                            val image = contact.uploadImage(stream)
+                            onlyUploadTime += (System.currentTimeMillis()-oneUploadTimeStart)
+                            imageMsgBuilder.add(contact.bot, image)
+                            stream
+                        }.onFailure {
+                            logger.error(it)
+                            imageMsgBuilder.add(contact.bot, PlainText(ReplyConfig.networkError))
+                        }.onSuccess {
+                            runInterruptible(Dispatchers.IO) {
+                                it.close()
+                            }
+                        }
+                    }
+                }
+
+                val uploadTime = System.currentTimeMillis() - uploadStart
+                val allTime = System.currentTimeMillis() - allTimeStart;
+                logger.info("总共耗时$allTime ms, 调用图片api接口耗时$getUrlTime ms, 下载上传图片总共耗时$uploadTime ms, 下载图片合计耗时$onlyDownloadTime ms, 上传图片合计耗时$onlyUploadTime ms")
+
+                
+                                
+                val imgReceipt = sendMessage(imageMsgBuilder.build())
+                if (notificationReceipt != null)
+                    recall(RecallType.NOTIFICATION, notificationReceipt, 0)
+                if (imgReceipt == null) {
+                    return@withLock
+                } else if (recall > 0 && PluginConfig.recallImg)
+                    recall(RecallType.IMAGE, imgReceipt, recall)
+                if (cooldown > 0)
+                    cooldown(subject, cooldown)
+             }
+            
+        }
+    }
+
+
     // @SubCommand("停止涩涩", "退膛")
     // @Description("停止缓存池")
     // suspend fun CommandSenderOnMessage<MessageEvent>.stopcache(reqNum: String = "") {

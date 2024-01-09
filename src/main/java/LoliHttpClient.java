@@ -63,6 +63,7 @@ public class LoliHttpClient {
         if(url.startsWith("https")) {
             httpclient = sslClient;
         }
+
         try {
 
             HttpPost httppost = new HttpPost(url);
@@ -85,6 +86,15 @@ public class LoliHttpClient {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+        finally {
+            if (response!=null) {
+                try {
+                    response.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
 
         return content;
@@ -111,18 +121,29 @@ public class LoliHttpClient {
         if(url.startsWith("https")) {
             httpclient = sslClient;
         }
+
+        CloseableHttpResponse response = null;
         try {
 
             HttpGet httpget = new HttpGet(url);
             if(null != authorization) {
                 httpget.addHeader(authorizationKeyName, authorization);
             }
-            CloseableHttpResponse response = httpclient.execute(httpget);
+            response = httpclient.execute(httpget);
             content = getBody(response);
         } catch (ClientProtocolException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+        finally {
+            if (response!=null) {
+                try {
+                    response.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
 
         return content;
@@ -135,6 +156,7 @@ public class LoliHttpClient {
         if(url.startsWith("https")) {
             httpclient = sslClient;
         }
+        CloseableHttpResponse response = null;
         try {
 
             HttpGet httpget = new HttpGet(url);
@@ -142,12 +164,21 @@ public class LoliHttpClient {
                 httpget.addHeader(headerkey, headers.get(headerkey));
             }
 
-            CloseableHttpResponse response = httpclient.execute(httpget);
+            response = httpclient.execute(httpget);
             content = getBody(response);
         } catch (ClientProtocolException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+        finally {
+            if (response!=null) {
+                try {
+                    response.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
         return content;
     }

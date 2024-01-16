@@ -45,4 +45,16 @@ object PluginData : AutoSavePluginData("Data") {
 
     @ValueDescription("自定义了冷却时间的群和对应的值")
     val customCooldownGroups: MutableMap<Long, Int> by value()
+
+    @ValueDescription("群定制化参数存储")
+    val customParamGroups: MutableMap<String, Any> by value()
+
+    @ValueDescription("用户定制化参数存储")
+    val customParamUsers: MutableMap<String, Any> by value()
+
+    @ValueDescription("群图库状态")
+    val customPoolGroups: MutableMap<String, String> by value()
+
+    @ValueDescription("用户图库状态")
+    val customPoolUsers: MutableMap<String, String> by value()
 }

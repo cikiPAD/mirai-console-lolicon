@@ -810,9 +810,22 @@ object Lolicon : CompositeCommand(
 
         if (isSp) {
             isSucc = ImageSourceManager.getInstance().setCurrentTypeSp(type)
+
+            
+            if (PluginData.customPoolUsers == null) {
+                PluginData.customPoolUsers = mutableMapOf()
+            }
+            
+            PluginData.customPoolUsers[ParamsConstant.TAG] = type
         }
         else {
             isSucc = ImageSourceManager.getInstance().setCurrentTypeNormal(type)
+
+            if (PluginData.customPoolGroups == null) {
+                PluginData.customPoolGroups = mutableMapOf()
+            }
+            
+            PluginData.customPoolGroups[ParamsConstant.TAG] = type
         }
         
         if(isSucc) {
@@ -867,7 +880,7 @@ object Lolicon : CompositeCommand(
 
         
         if (PluginData.customParamUsers != null) {
-            for ((key, value) in PluginData.customParamGroups) {
+            for ((key, value) in PluginData.customParamUsers) {
                 ImageSourceManager.getInstance().putAdditionParamSp(key, value)
             }
         }
@@ -998,10 +1011,27 @@ object Lolicon : CompositeCommand(
 
         if (isSp) {
             ImageSourceManager.getInstance().putAdditionParamSp(key, value)
+
+            if (PluginData.customParamUsers == null) {
+                PluginData.customParamUsers = mutableMapOf()
+            }
+
+            PluginData.customParamUsers[key] = value;
+            
+            
             sendMessage("成功设置特殊图库缓存属性$key 为 $value")
         }
         else {
             ImageSourceManager.getInstance().putAdditionParamNormal(key, value)
+
+
+            if (PluginData.customParamGroups == null) {
+                PluginData.customParamGroups = mutableMapOf()
+            }
+
+            PluginData.customParamGroups[key] = value;
+            
+            
             sendMessage("成功设置普通图库缓存属性$key 为 $value")
         }
         

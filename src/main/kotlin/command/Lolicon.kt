@@ -812,18 +812,10 @@ object Lolicon : CompositeCommand(
             isSucc = ImageSourceManager.getInstance().setCurrentTypeSp(type)
 
             
-            if (PluginData.customPoolUsers == null) {
-                PluginData.customPoolUsers = mutableMapOf()
-            }
-            
             PluginData.customPoolUsers[ParamsConstant.TAG] = type
         }
         else {
             isSucc = ImageSourceManager.getInstance().setCurrentTypeNormal(type)
-
-            if (PluginData.customPoolGroups == null) {
-                PluginData.customPoolGroups = mutableMapOf()
-            }
             
             PluginData.customPoolGroups[ParamsConstant.TAG] = type
         }
@@ -863,27 +855,27 @@ object Lolicon : CompositeCommand(
 
         //加载图库存储的配置
 
-        if (PluginData.customPoolGroups != null) {
-            ImageSourceManager.getInstance().setCurrentTypeNormal(PluginData.customPoolGroups[ParamsConstant.TAG])
-        }
         
-        if (PluginData.customPoolUsers != null) {
-            ImageSourceManager.getInstance().setCurrentTypeSp(PluginData.customPoolUsers[ParamsConstant.TAG])
-        }
+        ImageSourceManager.getInstance().setCurrentTypeNormal(PluginData.customPoolGroups[ParamsConstant.TAG])
+        
+        
+       
+        ImageSourceManager.getInstance().setCurrentTypeSp(PluginData.customPoolUsers[ParamsConstant.TAG])
+        
 
-
-        if (PluginData.customParamGroups != null) {
-            for ((key, value) in PluginData.customParamGroups) {
-                ImageSourceManager.getInstance().putAdditionParamNormal(key, value)
-            }
-        }
 
         
-        if (PluginData.customParamUsers != null) {
-            for ((key, value) in PluginData.customParamUsers) {
-                ImageSourceManager.getInstance().putAdditionParamSp(key, value)
-            }
+        for ((key, value) in PluginData.customParamGroups) {
+            ImageSourceManager.getInstance().putAdditionParamNormal(key, value)
         }
+    
+
+        
+        
+        for ((key, value) in PluginData.customParamUsers) {
+            ImageSourceManager.getInstance().putAdditionParamSp(key, value)
+        }
+        
 
         
         ImageCachedPool.getInstance().boot(Runnable {
@@ -1012,9 +1004,6 @@ object Lolicon : CompositeCommand(
         if (isSp) {
             ImageSourceManager.getInstance().putAdditionParamSp(key, value)
 
-            if (PluginData.customParamUsers == null) {
-                PluginData.customParamUsers = mutableMapOf()
-            }
 
             PluginData.customParamUsers[key] = value;
             
@@ -1024,10 +1013,6 @@ object Lolicon : CompositeCommand(
         else {
             ImageSourceManager.getInstance().putAdditionParamNormal(key, value)
 
-
-            if (PluginData.customParamGroups == null) {
-                PluginData.customParamGroups = mutableMapOf()
-            }
 
             PluginData.customParamGroups[key] = value;
             

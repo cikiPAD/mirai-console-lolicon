@@ -847,6 +847,31 @@ object Lolicon : CompositeCommand(
         }
         logger.info("开始装填")
         val contact = subject as Contact
+
+        //加载图库存储的配置
+
+        if (PluginData.customPoolGroups != null) {
+            ImageSourceManager.getInstance().setCurrentTypeNormal(PluginData.customPoolGroups[ParamsConstant.TAG])
+        }
+        
+        if (PluginData.customPoolUsers != null) {
+            ImageSourceManager.getInstance().setCurrentTypeSp(PluginData.customPoolUsers[ParamsConstant.TAG])
+        }
+
+
+        if (PluginData.customParamGroups != null) {
+            for ((key, value) in PluginData.customParamGroups) {
+                ImageSourceManager.getInstance().putAdditionParamNormal(key, value)
+            }
+        }
+
+        
+        if (PluginData.customParamUsers != null) {
+            for ((key, value) in PluginData.customParamGroups) {
+                ImageSourceManager.getInstance().putAdditionParamSp(key, value)
+            }
+        }
+
         
         ImageCachedPool.getInstance().boot(Runnable {
             runBlocking {

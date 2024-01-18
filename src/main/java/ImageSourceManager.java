@@ -267,7 +267,7 @@ public class ImageSourceManager {
 
     public Object castSomeValue(String key, Object value) {
         if (ParamsConstant.NUM.equalsIgnoreCase(key)) {
-            int num = Integer.valueOf((String) value);
+            int num = castAutoSavedDataToInteger(value);
             if (num<=0 || num > 10) {
                 System.out.println("num数量非法，设置为2");
                 num = 2;
@@ -276,10 +276,27 @@ public class ImageSourceManager {
         }
 
         if (ParamsConstant.R18.equalsIgnoreCase(key)) {
-            int r18 = Integer.valueOf((String) value);
+            int r18 = castAutoSavedDataToInteger(value);
             return r18;
         }
         return value;
+    }
+    
+    public Integer castAutoSavedDataToInteger(Object value) {
+        if (value == null) {
+            return null;
+        }
+        
+        if (value instanceof Integer) {
+            return (Integer) value;
+        }
+        else if (value instanceof String) {
+            return Integer.valueOf((String) value);
+        }
+        else {
+            throw new IllegalArgumentException("错误参数格式");
+        }
+        
     }
 
 

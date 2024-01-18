@@ -857,7 +857,7 @@ object Lolicon : CompositeCommand(
         }
         
         
-        if ((PluginData.customPoolUsers[ParamsConstant.TAG] != null) { 
+        if (PluginData.customPoolUsers[ParamsConstant.TAG] != null) { 
             ImageSourceManager.getInstance().setCurrentTypeSp(PluginData.customPoolUsers[ParamsConstant.TAG])
         }
         

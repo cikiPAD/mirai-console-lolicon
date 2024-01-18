@@ -810,21 +810,18 @@ object Lolicon : CompositeCommand(
 
         if (isSp) {
             isSucc = ImageSourceManager.getInstance().setCurrentTypeSp(type)
-
-            
-            PluginData.customPoolUsers[ParamsConstant.TAG] = type
         }
         else {
             isSucc = ImageSourceManager.getInstance().setCurrentTypeNormal(type)
-            
-            PluginData.customPoolGroups[ParamsConstant.TAG] = type
         }
         
         if(isSucc) {
             if (isSp) {
+                PluginData.customPoolUsers[ParamsConstant.TAG] = type
                 ImageCachedPool.getInstance().clearCacheSp()
             }
             else {
+                PluginData.customPoolGroups[ParamsConstant.TAG] = type
                 ImageCachedPool.getInstance().clearCacheNormal()
             }
             ImageCachedPool.getInstance().startRun()
@@ -855,12 +852,14 @@ object Lolicon : CompositeCommand(
 
         //加载图库存储的配置
 
+        if (PluginData.customPoolGroups[ParamsConstant.TAG] != null) {
+            ImageSourceManager.getInstance().setCurrentTypeNormal(PluginData.customPoolGroups[ParamsConstant.TAG])
+        }
         
-        ImageSourceManager.getInstance().setCurrentTypeNormal(PluginData.customPoolGroups[ParamsConstant.TAG])
         
-        
-       
-        ImageSourceManager.getInstance().setCurrentTypeSp(PluginData.customPoolUsers[ParamsConstant.TAG])
+        if ((PluginData.customPoolUsers[ParamsConstant.TAG] != null) { 
+            ImageSourceManager.getInstance().setCurrentTypeSp(PluginData.customPoolUsers[ParamsConstant.TAG])
+        }
         
 
 
@@ -1040,10 +1039,12 @@ object Lolicon : CompositeCommand(
 
         if (isSp) {
             ImageSourceManager.getInstance().clearAdditionParamSp()
+            PluginData.customParamUsers.clear()
             sendMessage("成功清理特殊图库缓存属性")
         }
         else {
             ImageSourceManager.getInstance().clearAdditionParamNormal()
+            PluginData.customParamGroups.clear()
             sendMessage("成功清理普通图库缓存属性")
         }
     }

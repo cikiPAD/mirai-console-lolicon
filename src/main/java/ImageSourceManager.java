@@ -105,9 +105,7 @@ public class ImageSourceManager {
 
                 if (needAddParm) {
                     if (!additionParamSp.isEmpty()) {
-                        for (String paramKey : additionParamSp.keySet()) {
-                            params.put(paramKey, additionParamSp.get(paramKey));
-                        }
+                        putToMapForWithPrefix(params, additionParamSp, currentTypeSp);
                     }
                 }
 
@@ -124,9 +122,7 @@ public class ImageSourceManager {
 
                 if (needAddParm) {
                     if (!additionParamNormal.isEmpty()) {
-                        for (String paramKey : additionParamNormal.keySet()) {
-                            params.put(paramKey, additionParamNormal.get(paramKey));
-                        }
+                        putToMapForWithPrefix(params, additionParamNormal, currentTypeNormal);
                     }
                 }
 
@@ -152,9 +148,9 @@ public class ImageSourceManager {
         try {
             if (needAddParm) {
                 if (!additionParamNormal.isEmpty()) {
-                    for (String paramKey : additionParamNormal.keySet()) {
-                        params.put(paramKey, additionParamNormal.get(paramKey));
-                    }
+
+                    putToMapForWithPrefix(params, additionParamNormal, currentTypeNormal);
+                    
                 }
             }
 
@@ -176,11 +172,13 @@ public class ImageSourceManager {
 
             if (needAddParm) {
                 if (!additionParamSp.isEmpty()) {
-                    for (String paramKey : additionParamSp.keySet()) {
-                        params.put(paramKey, additionParamSp.get(paramKey));
-                    }
+
+                    putToMapForWithPrefix(params, additionParamSp, currentTypeSp);
+                    
                 }
+                
             }
+            
 
 
             if (sources.containsKey(currentTypeSp)) {
@@ -281,12 +279,12 @@ public class ImageSourceManager {
         }
         return value;
     }
-    
+
     public Integer castAutoSavedDataToInteger(Object value) {
         if (value == null) {
             return null;
         }
-        
+
         if (value instanceof Integer) {
             return (Integer) value;
         }
@@ -296,7 +294,31 @@ public class ImageSourceManager {
         else {
             throw new IllegalArgumentException("错误参数格式");
         }
-        
+
+    }
+
+    /**
+     * 根据参数用:分割来指定不同图库使用不同参数
+     */
+    public void putToMapForWithPrefix(Map<String, Object> params, Map<String, Object> additionParam, String type) {
+        if (!additionParam.isEmpty()) {
+            for (String paramKey : additionParam.keySet()) {
+                if (paramKey == null) {
+                    continue;
+                }
+                
+                if (paramKey.contains(":")) {
+                    String matchType = paramKey.split(":")[0];
+                    String newKey = paramKey.split(":")[1];
+                    if (matchType.equalsIgnoreCase(type)) {
+                        params.put(newKey, additionParam.get(paramKey));
+                    }
+                }
+                else {
+                    params.put(paramKey, additionParam.get(paramKey));
+                }
+            }
+        }
     }
 
 

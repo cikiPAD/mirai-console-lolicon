@@ -30,7 +30,7 @@ public class ImageCachedPool extends Thread {
 
     private static ImageCachedPool instance = new ImageCachedPool();
 
-    private int loopCount = 0;
+    private volatile int loopCount = 0;
 
 
     private Runnable runnable = null;

@@ -190,7 +190,7 @@ public class PidUidSearchImpl implements ImageSourceInterface {
                 else {
                     oneUrl = (String) one.get("large");
                 }
-                if (oneUrl!=null & oneUrl.length()!=0) {
+                if (oneUrl!=null && oneUrl.length()!=0) {
                     oneRet.add(oneUrl);
                 }
             }
